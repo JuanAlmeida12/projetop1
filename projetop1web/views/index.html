@@ -1,0 +1,103 @@
+ <!DOCTYPE html>
+  <html>
+    <head>
+      <!--Import Google Icon Font-->
+      <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <!--Import materialize.css-->
+      <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+      <!--Let browser know website is optimized for mobile-->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+      <style type="text/css">
+        html, body 
+        { 
+          height: 100%; 
+          width: 100%;
+          margin: 0; 
+          padding: 0; 
+        }
+        #map 
+        { 
+          height: 100%;
+          width: 100%;
+        }
+        #wrapper { 
+          position: relative;
+          height: 93%;
+          width: 100%;
+        }
+        #cardinfo
+        {
+          position: absolute;
+          top: 20%; 
+          left: 50%;
+          z-index: 99;
+        }
+        .img-circle {
+          border-radius: 50%;
+          width: 150px;
+          height: 150px;
+          margin: 30px;
+        }
+
+      </style>
+    </head>
+
+    <body>
+       <nav>
+          <div class="nav-wrapper indigo">
+            <ul id="slide-out" class="side-nav">
+              <li>
+                <img id="user-image-slide-menu" class="img-circle" src="images/anonymous.png">                
+              </li>
+              <li><a href="#!">Ver Conquistar</a></li>
+              <li><a href="#!">Amigos</a></li>
+            </ul>
+            <a href="#" data-activates="slide-out" class="button-collapse" id="navcollapse"><i class="view_module"></i></a>
+            <a href="javascript:showSlideMenu()" id="drawermenu" class="brand-logo"><i class="material-icons large">view_module</i></a>
+            <a href="#" class="brand-logo center">WD</a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+              <li id="login"><a href="javascript:authGoogle()">Login</a></li>
+            </ul>
+        </div>
+      </nav>
+
+      <div id="wrapper">
+        <div id='cardinfo'class="row">
+          <div class="col s12 m7 pull s5">
+            <div class="card">
+              <div class="card-image">
+                <img src="images/cardimage.jpg">
+                <span class="card-title">WorldDiscovery</span>
+              </div>
+              <div class="card-content">
+                <p>Viaje e conheça lugares de forma divertida e ganhe varias conquistar com isso. Torne-se o maior explorador.</p>
+              </div>
+              <div class="card-action">
+                <a href="#">Começar</a>
+              </div>
+            </div>
+          </div>
+        </div>
+              
+
+        <!--Map-->
+        <div id="map"></div>
+      </div>
+      <!--Import jQuery before materialize.js-->
+      <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+      <script type="text/javascript" src="js/materialize.min.js"></script>
+      <!--Import Firebase API-->
+      <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
+      <script src="https://apis.google.com/js/platform.js" async defer></script>
+      
+      <script type="text/javascript" src="js/services.js"></script>
+      <script type="text/javascript" src="js/maps.js"></script>
+      <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwxt5GqFKborDsCngWP1_znK7Y8mP5SrY&callback=initMap">
+      </script>
+    </body>
+  </html>
+        
