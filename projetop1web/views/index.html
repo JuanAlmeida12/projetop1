@@ -1,29 +1,39 @@
  <!DOCTYPE html>
   <html>
     <head>
+      <title>WoldDiscovery</title>
+
+      <link rel="icon" type="image/png" href="images/world.png">
+
+      <script src="http://maps.googleapis.com/maps/api/js?v=3.exp&key=AIzaSyDwxt5GqFKborDsCngWP1_znK7Y8mP5SrY&libraries=places"></script>
+
       <!--Import Google Icon Font-->
       <link href="http://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
       <!--Import materialize.css-->
       <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
 
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+      <!-- Map Icons -->
+      <link rel="stylesheet" type="text/css" href="dist/css/map-icons.css">
+
       <!--Let browser know website is optimized for mobile-->
       <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
       <style type="text/css">
-        html, body 
-        { 
-          height: 100%; 
+        html, body
+        {
+          height: 100%;
           width: 100%;
-          margin: 0; 
-          padding: 0; 
+          margin: 0;
+          padding: 0;
         }
-        #map 
-        { 
+        #map
+        {
           height: 100%;
           width: 100%;
         }
-        #wrapper { 
+        #wrapper {
           position: relative;
           height: 93%;
           width: 100%;
@@ -31,7 +41,7 @@
         #cardinfo
         {
           position: absolute;
-          top: 20%; 
+          top: 20%;
           left: 50%;
           z-index: 99;
         }
@@ -50,7 +60,7 @@
           <div class="nav-wrapper indigo">
             <ul id="slide-out" class="side-nav">
               <li>
-                <img id="user-image-slide-menu" class="img-circle" src="images/anonymous.png">                
+                <img id="user-image-slide-menu" class="img-circle" src="images/anonymous.png">
               </li>
               <li><a href="#!">Ver Conquistar</a></li>
               <li><a href="#!">Amigos</a></li>
@@ -76,12 +86,12 @@
                 <p>Viaje e conheça lugares de forma divertida e ganhe varias conquistar com isso. Torne-se o maior explorador.</p>
               </div>
               <div class="card-action">
-                <a href="#">Começar</a>
+                <a href="javascript:dismissStartCard()">Começar</a>
               </div>
             </div>
           </div>
         </div>
-              
+
 
         <!--Map-->
         <div id="map"></div>
@@ -92,12 +102,9 @@
       <!--Import Firebase API-->
       <script src="https://www.gstatic.com/firebasejs/3.1.0/firebase.js"></script>
       <script src="https://apis.google.com/js/platform.js" async defer></script>
-      
+
       <script type="text/javascript" src="js/services.js"></script>
+      <script type="text/javascript" src="dist/js/map-icons.js"></script>
       <script type="text/javascript" src="js/maps.js"></script>
-      <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDwxt5GqFKborDsCngWP1_znK7Y8mP5SrY&callback=initMap">
-      </script>
     </body>
   </html>
-        

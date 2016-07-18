@@ -24,10 +24,11 @@ function verifyUser(user) {
 		$("#nav-mobile").append("<li id='chat'><a href='#'><i class='material-icons'>chat_bubble</i></a></li>");
 		$("#nav-mobile").append("<li id='logout'><a href='javascript:signOut()'>Sair</a></li>");
 		$("#user-image-slide-menu")
-        	.mouseover(function() { 
+        	.mouseover(function() {
 	            $(this).attr("src", user.photoURL);
         })
 	} else {
+		$("#login").remove();
 		console.log("Nao logado");
 		$("#nav-mobile").append("<li id='login'><a href='javascript:authGoogle()'>Login</a></li>")
 		$("#logout").remove();
@@ -75,4 +76,8 @@ function authGoogle() {
 	  	var credential = error.credential;
 	  	// ...
 	});
+}
+
+function dismissStartCard(){
+	$('#cardinfo').remove();
 }
