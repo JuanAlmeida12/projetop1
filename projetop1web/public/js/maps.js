@@ -56,15 +56,31 @@ function showPosition(position) {
         position.coords.latitude, position.coords.longitude);
 
     map.setCenter(mposition);
+    // var placeData = {
+    //     placeName: "Trem Maria Fumaça",
+    //     description: {
+    //         en: "Train Steam train",
+    //         pt: "Trem Maria Fumaça"
+    //     },
+    //     lat: -7.228926,
+    //     lng: -35.884745,
+    //     tags: ["monument","historic"]
+    // };
+    // var newPlaceKey = firebase.database().ref().child('places').push().key;
+    // var updates = {};
+    // updates['/posts/' + newPlaceKey] = placeData;
+    // firebase.database().ref().update(updates);
 
-    var request = {
-        location: mposition,
-        radius: '5000',
-        types: ['natural_feature','stadium', 'park','city_hall', 'art_gallery','library']
-    };
+    firebase.database().ref('posts/').on('value', function(snapshot) {
+            console.log(snapshot.val());
+            var places = {};
+            for (key in snapshot.val()){
+                console.log(snapshot.val()[key]);
+                createMarker(snapshot.val()[key],false);
+            }
+        });
 
-    service = new google.maps.places.PlacesService(map);
-    service.nearbySearch(request, callback);
+
 
 }
 
@@ -93,7 +109,7 @@ function createMarker(place, visited) {
         map_icon = 'map-icon-point-of-interest';
     }
     var colorMarker = Math.floor((Math.random() * 5));
-    var placeLoc = place.geometry.location;
+    var placeLoc = new google.maps.LatLng( place.lat, place.lng ) ;
     var marker = new Marker({
         map: map,
         position: placeLoc,
@@ -108,7 +124,7 @@ function createMarker(place, visited) {
     });
 
     google.maps.event.addListener(marker, 'click', function() {
-        infowindow.setContent(place.name);
+        infowindow.setContent(place.placeName);
         infowindow.open(map, this);
     });
 }
