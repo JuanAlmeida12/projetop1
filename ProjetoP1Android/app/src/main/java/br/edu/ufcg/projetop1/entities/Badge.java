@@ -6,5 +6,6 @@ package br.edu.ufcg.projetop1.entities;
 public class Badge {
     String name;
     String description;
+    int status;
 
 }

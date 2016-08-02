@@ -21,7 +21,8 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_score" />
+    <include layout="@layout/content_score"
+        android:id="@+id/text_score" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

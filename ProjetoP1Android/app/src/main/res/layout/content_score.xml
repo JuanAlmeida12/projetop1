@@ -12,14 +12,21 @@
     tools:context="br.edu.ufcg.projetop1.views.ScoreActivity"
     tools:showIn="@layout/activity_score">
 
-    <EditText
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="number"
-        android:ems="10"
-        android:id="@+id/editTextScore"
+        android:text="0"
+        android:id="@+id/score_text"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="90dp"
-        android:autoText="false" />
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Score: "
+        android:id="@+id/textView2"
+        android:layout_alignBottom="@+id/score_text"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
+
 </RelativeLayout>
