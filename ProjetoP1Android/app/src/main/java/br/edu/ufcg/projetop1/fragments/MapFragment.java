@@ -4,6 +4,8 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,12 +16,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -27,26 +31,37 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.List;
 
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.GeofenceErrorMessages;
 import br.edu.ufcg.projetop1.core.Point;
 import br.edu.ufcg.projetop1.services.GeofenceTransitionsIntentService;
 import br.edu.ufcg.projetop1.utils.MapUtil;
+import br.edu.ufcg.projetop1.views.MainActivity;
 
 public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private final static String GALLERY = "GALLERY";
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
@@ -55,9 +70,16 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     private FirebaseDatabase database;
     private ArrayList<Geofence> mGeofenceList;
     public final static String TAG = "Map";
+    public TextView scoreView;
+    private int score;
+    private boolean isGallery;
+    private FirebaseStorage storage;
 
-    public static Fragment getNewInstance() {
+    public static Fragment getNewInstance(boolean isGallery) {
         MapFragment newFragment = new MapFragment();
+        Bundle arg = new Bundle();
+        arg.putBoolean(GALLERY, isGallery);
+        newFragment.setArguments(arg);
         return newFragment;
     }
 
@@ -65,6 +87,14 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_main_wd, null);
+
+        Bundle args = getArguments();
+        isGallery = args.getBoolean(GALLERY, false);
+        storage = FirebaseStorage.getInstance();
+
+        scoreView = (TextView) mView.findViewById(R.id.tvscore);
+        score = 0;
+        scoreView.setText(getString(R.string.score) + score);
 
         database = FirebaseDatabase.getInstance();
         // Create an instance of GoogleAPIClient.
@@ -86,16 +116,20 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+        scoreCount();
+
+        return mView;
+    }
+
+    private void scoreCount() {
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference myRefplaces = database.getReference("user-place").child(userid);
         ChildEventListener visitedListener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Iterator i = dataSnapshot.getChildren().iterator();
-                while (i.hasNext()) {
-                    Log.e(TAG, i.next().toString());
-                }
 
+                score = dataSnapshot.child("score").getValue(Integer.class);
+                scoreView.setText(getString(R.string.score) + score);
             }
 
             @Override
@@ -119,8 +153,6 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
             }
         };
         myRefplaces.addChildEventListener(visitedListener);
-
-        return mView;
     }
 
     private void setPointsOnMap() {
@@ -193,7 +225,37 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         mMap.setMyLocationEnabled(true);
         // Add a marker in Sydney and move the camera
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        setPointsOnMap();
+        if (!isGallery) {
+            setPointsOnMap();
+        } else {
+            List<String> photos = MainActivity.userPhotos;
+            final StorageReference storageRef = storage.getReferenceFromUrl(getString(R.string.storageref));
+            for (final String photorefString : photos) {
+                final StorageReference photoref = storageRef.child(photorefString);
+                photoref.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        final BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
+
+                        photoref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
+                            @Override
+                            public void onSuccess(StorageMetadata storageMetadata) {
+                                double lat = Double.parseDouble(storageMetadata.getCustomMetadata("lat"));
+                                double lng = Double.parseDouble(storageMetadata.getCustomMetadata("lng"));
+                                LatLng pointLatLng = new LatLng(lat, lng);
+                                MarkerOptions marker = new MarkerOptions();
+                                marker.position(pointLatLng);
+                                marker.icon(icon);
+                                mMap.addMarker(marker);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+
+
     }
 
     @Override
