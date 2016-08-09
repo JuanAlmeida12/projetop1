@@ -29,11 +29,11 @@ public class MapUtil {
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
     }
 
-    private static Map<String,String> geofencesIds = new HashMap<String,String>();
+    public static Map<String,Point> geofencesIds = new HashMap<String,Point>();
 
     public static void createGeofece(Point point){
         String id = UUID.randomUUID().toString();
-        geofencesIds.put(point.placeName,id);
+        geofencesIds.put(id,point);
 
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(id)

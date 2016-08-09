@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
@@ -14,17 +15,22 @@ import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.GeofenceErrorMessages;
+import br.edu.ufcg.projetop1.core.Point;
+import br.edu.ufcg.projetop1.utils.MapUtil;
 import br.edu.ufcg.projetop1.views.MainActivity;
 
 /**
  * Listener for geofence transition changes.
- *
+ * <p/>
  * Receives geofence transition events from Location Services in the form of an Intent containing
  * the transition type and geofence id(s) that triggered the transition. Creates a notification
  * as the output.
@@ -49,6 +55,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     /**
      * Handles incoming intents.
+     *
      * @param intent sent by Location Services. This Intent is provided to Location
      *               Services (inside a PendingIntent) when addGeofences() is called.
      */
@@ -79,10 +86,11 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     triggeringGeofences
             );
 
-            
 
             // Send notification and log the transition details.
-            sendNotification(geofenceTransitionDetails);
+            for (Geofence geo : triggeringGeofences) {
+                sendNotification(geo.getRequestId());
+            }
             Log.i(TAG, geofenceTransitionDetails);
         } else {
             // Log the error.
@@ -93,10 +101,10 @@ public class GeofenceTransitionsIntentService extends IntentService {
     /**
      * Gets transition details and returns them as a formatted string.
      *
-     * @param context               The app context.
-     * @param geofenceTransition    The ID of the geofence transition.
-     * @param triggeringGeofences   The geofence(s) triggered.
-     * @return                      The transition details formatted as String.
+     * @param context             The app context.
+     * @param geofenceTransition  The ID of the geofence transition.
+     * @param triggeringGeofences The geofence(s) triggered.
+     * @return The transition details formatted as String.
      */
     private String getGeofenceTransitionDetails(
             Context context,
@@ -110,7 +118,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         for (Geofence geofence : triggeringGeofences) {
             triggeringGeofencesIdsList.add(geofence.getRequestId());
         }
-        String triggeringGeofencesIdsString = TextUtils.join(", ",  triggeringGeofencesIdsList);
+        String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
@@ -119,10 +127,23 @@ public class GeofenceTransitionsIntentService extends IntentService {
      * Posts a notification in the notification bar when a transition is detected.
      * If the user clicks the notification, control goes to the MainActivity.
      */
-    private void sendNotification(String notificationDetails) {
+    private void sendNotification(final String notificationDetails) {
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
         notificationIntent.putExtra("fence", notificationDetails);
+        final Point point = MapUtil.geofencesIds.get(notificationDetails);
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference("user-place");
+                String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                myRef.child(userid).child(point.placeName).setValue(true);
+                return null;
+            }
+        }.execute();
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
@@ -141,14 +162,14 @@ public class GeofenceTransitionsIntentService extends IntentService {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
         // Define the notification settings.
-        builder.setSmallIcon(R.mipmap.ic_launcher)
+        builder.setSmallIcon(R.drawable.wdicon)
                 // In a real app, you may want to use a library like Volley
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(),
                         R.drawable.wdicon))
                 .setColor(Color.BLUE)
-                .setContentTitle(notificationDetails)
-                .setContentText(getString(R.string.geofence_transition_notification_text))
+                .setContentTitle(point.placeName)
+                .setContentText("Você esta proximo ao ponto "+ point.placeName+", faça uma visita. =D")
                 .setContentIntent(notificationPendingIntent);
 
         // Dismiss notification once the user touches it.
@@ -165,8 +186,8 @@ public class GeofenceTransitionsIntentService extends IntentService {
     /**
      * Maps geofence transition types to their human-readable equivalents.
      *
-     * @param transitionType    A transition type constant defined in Geofence
-     * @return                  A String indicating the type of transition
+     * @param transitionType A transition type constant defined in Geofence
+     * @return A String indicating the type of transition
      */
     private String getTransitionString(int transitionType) {
         switch (transitionType) {

@@ -29,6 +29,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -36,6 +37,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.GeofenceErrorMessages;
@@ -83,6 +85,40 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference myRefplaces = database.getReference("user-place").child(userid);
+        ChildEventListener visitedListener = new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Iterator i = dataSnapshot.getChildren().iterator();
+                while (i.hasNext()) {
+                    Log.e(TAG, i.next().toString());
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+        myRefplaces.addChildEventListener(visitedListener);
 
         return mView;
     }
