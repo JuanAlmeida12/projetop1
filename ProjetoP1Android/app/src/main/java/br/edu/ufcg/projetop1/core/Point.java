@@ -23,15 +23,19 @@ public class Point {
 
     public List<String> tags;
 
-    public Point(){
+    public int score;
+
+
+    public Point() {
 
     }
 
-    public Point(Map<String, String> description, Double lat, Double lng, String placeName, List<String> tags) {
+    public Point(Map<String, String> description, Double lat, Double lng, String placeName, List<String> tags, int score) {
         this.description = description;
         this.lat = lat;
         this.lng = lng;
         this.placeName = placeName;
         this.tags = tags;
+        this.score = score;
     }
 }
