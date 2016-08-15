@@ -1,17 +1,24 @@
 package br.edu.ufcg.projetop1.fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,7 +30,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
@@ -34,9 +40,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -47,19 +53,22 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.GeofenceErrorMessages;
+import br.edu.ufcg.projetop1.core.MyImageView;
+import br.edu.ufcg.projetop1.core.PhotoUser;
 import br.edu.ufcg.projetop1.core.Point;
+import br.edu.ufcg.projetop1.dialogs.PhotoDialog;
 import br.edu.ufcg.projetop1.services.GeofenceTransitionsIntentService;
 import br.edu.ufcg.projetop1.utils.MapUtil;
 import br.edu.ufcg.projetop1.views.MainActivity;
 
-public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
 
     private final static String GALLERY = "GALLERY";
     private GoogleMap mMap;
@@ -74,6 +83,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     private int score;
     private boolean isGallery;
     private FirebaseStorage storage;
+    public static Map<String, PhotoUser> photoUserMap;
 
     public static Fragment getNewInstance(boolean isGallery) {
         MapFragment newFragment = new MapFragment();
@@ -84,19 +94,26 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        score = 0;
+        database = FirebaseDatabase.getInstance();
+        storage = FirebaseStorage.getInstance();
+        photoUserMap = new HashMap<>();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         mView = inflater.inflate(R.layout.activity_main_wd, null);
 
         Bundle args = getArguments();
         isGallery = args.getBoolean(GALLERY, false);
-        storage = FirebaseStorage.getInstance();
 
         scoreView = (TextView) mView.findViewById(R.id.tvscore);
-        score = 0;
         scoreView.setText(getString(R.string.score) + score);
 
-        database = FirebaseDatabase.getInstance();
+
         // Create an instance of GoogleAPIClient.
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getContext())
@@ -128,8 +145,12 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-                score = dataSnapshot.child("score").getValue(Integer.class);
-                scoreView.setText(getString(R.string.score) + score);
+                if (dataSnapshot.hasChild("score")) {
+                    score = dataSnapshot.child("score").getValue(Integer.class);
+                }
+                if (scoreView != null) {
+                    scoreView.setText(getString(R.string.score) + score);
+                }
             }
 
             @Override
@@ -223,6 +244,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
             return;
         }
         mMap.setMyLocationEnabled(true);
+        mMap.setOnMarkerClickListener(this);
         // Add a marker in Sydney and move the camera
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         if (!isGallery) {
@@ -235,19 +257,33 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
                 photoref.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                     @Override
                     public void onSuccess(byte[] bytes) {
-                        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        final BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(image);
-
+                        final Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
                         photoref.getMetadata().addOnSuccessListener(new OnSuccessListener<StorageMetadata>() {
                             @Override
-                            public void onSuccess(StorageMetadata storageMetadata) {
-                                double lat = Double.parseDouble(storageMetadata.getCustomMetadata("lat"));
-                                double lng = Double.parseDouble(storageMetadata.getCustomMetadata("lng"));
-                                LatLng pointLatLng = new LatLng(lat, lng);
-                                MarkerOptions marker = new MarkerOptions();
-                                marker.position(pointLatLng);
-                                marker.icon(icon);
-                                mMap.addMarker(marker);
+                            public void onSuccess(final StorageMetadata storageMetadata) {
+                                new AsyncTask<Void, Void, Bitmap>() {
+                                    @Override
+                                    protected Bitmap doInBackground(Void... voids) {
+                                        return getMarkerBitmapFromView(image);
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Bitmap bitmap) {
+                                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(bitmap);
+                                        double lat = Double.parseDouble(storageMetadata.getCustomMetadata("lat"));
+                                        double lng = Double.parseDouble(storageMetadata.getCustomMetadata("lng"));
+                                        String descript = storageMetadata.getCustomMetadata("descript");
+                                        LatLng pointLatLng = new LatLng(lat, lng);
+                                        MarkerOptions marker = new MarkerOptions();
+                                        marker.position(pointLatLng);
+                                        marker.icon(icon);
+
+                                        PhotoUser newPhoto = new PhotoUser(image, descript);
+
+                                        photoUserMap.put(mMap.addMarker(marker).getId(), newPhoto);
+                                    }
+                                }.execute();
+
                             }
                         });
                     }
@@ -256,6 +292,33 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         }
 
 
+    }
+
+    private Bitmap getMarkerBitmapFromView(Bitmap content_image) {
+
+        MyImageView customMarkerView = (MyImageView) ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.marker_custom, null);
+
+        customMarkerView.setResourseBitmap(content_image);
+        return createDrawableFromView(getActivity(), customMarkerView);
+    }
+
+    public Bitmap createDrawableFromView(Context context, View view) {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        ((Activity) context).getWindowManager().getDefaultDisplay()
+                .getMetrics(displayMetrics);
+        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+        view.measure(displayMetrics.widthPixels, displayMetrics.heightPixels);
+        view.layout(0, 0, displayMetrics.widthPixels,
+                displayMetrics.heightPixels);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(),
+                view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        Canvas canvas = new Canvas(bitmap);
+        view.draw(canvas);
+
+        return bitmap;
     }
 
     @Override
@@ -324,4 +387,28 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         }
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        if (isGallery) {
+            showDialog(marker.getId());
+        }
+        return false;
+    }
+
+    void showDialog(String id) {
+
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+
+        // Create and show the dialog.
+        DialogFragment newFragment = PhotoDialog.newInstance(9, id);
+        newFragment.show(ft, "dialog");
+    }
 }

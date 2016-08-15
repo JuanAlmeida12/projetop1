@@ -132,55 +132,58 @@ public class GeofenceTransitionsIntentService extends IntentService {
         Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
         notificationIntent.putExtra("fence", notificationDetails);
         final Point point = MapUtil.geofencesIds.get(notificationDetails);
+        if (null != point) {
 
-        new AsyncTask<Void, Void, Void>() {
+            new AsyncTask<Void, Void, Void>() {
 
-            @Override
-            protected Void doInBackground(Void... voids) {
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference myRef = database.getReference("user-place");
-                String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                myRef.child(userid).child(point.placeName).setValue(true);
-                return null;
-            }
-        }.execute();
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference("user-place");
+                    String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                    myRef.child(userid).child(point.placeName).child("visited").setValue(true);
+                    myRef.child(userid).child(point.placeName).child("score").setValue(point.score);
+                    return null;
+                }
+            }.execute();
 
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
+            // Construct a task stack.
+            TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MainActivity.class);
+            // Add the main Activity to the task stack as the parent.
+            stackBuilder.addParentStack(MainActivity.class);
 
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
+            // Push the content Intent onto the stack.
+            stackBuilder.addNextIntent(notificationIntent);
 
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+            // Get a PendingIntent containing the entire back stack.
+            PendingIntent notificationPendingIntent =
+                    stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+            // Get a notification builder that's compatible with platform versions >= 4
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.wdicon)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.wdicon))
-                .setColor(Color.BLUE)
-                .setContentTitle(point.placeName)
-                .setContentText("Você esta proximo ao ponto "+ point.placeName+", faça uma visita. =D")
-                .setContentIntent(notificationPendingIntent);
+            // Define the notification settings.
+            builder.setSmallIcon(R.drawable.wdicon)
+                    // In a real app, you may want to use a library like Volley
+                    // to decode the Bitmap.
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                            R.drawable.wdicon))
+                    .setColor(Color.BLUE)
+                    .setContentTitle(point.placeName)
+                    .setContentText("Você esta proximo ao ponto " + point.placeName + ", faça uma visita. =D")
+                    .setContentIntent(notificationPendingIntent);
 
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
+            // Dismiss notification once the user touches it.
+            builder.setAutoCancel(true);
 
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            // Get an instance of the Notification manager
+            NotificationManager mNotificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Issue the notification
-        mNotificationManager.notify(0, builder.build());
+            // Issue the notification
+            mNotificationManager.notify(0, builder.build());
+        }
     }
 
     /**
