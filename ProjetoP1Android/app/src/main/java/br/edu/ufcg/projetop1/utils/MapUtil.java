@@ -29,11 +29,11 @@ public class MapUtil {
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
     }
 
-    public static Map<String,Point> geofencesIds = new HashMap<String,Point>();
+    public static Map<String, Point> geofencesIds = new HashMap<String, Point>();
 
-    public static void createGeofece(Point point){
+    public static void createGeofece(Point point) {
         String id = UUID.randomUUID().toString();
-        geofencesIds.put(id,point);
+        geofencesIds.put(id, point);
 
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(id)
@@ -51,11 +51,13 @@ public class MapUtil {
 
     public static void bindGeofences(GoogleApiClient mGoogleApiClient, PendingIntent intent, ResultCallback<? super Status> callback) {
         try {
-            LocationServices.GeofencingApi.addGeofences(
-                    mGoogleApiClient,
-                    builder.build(),
-                    intent
-            ).setResultCallback(callback); // Result processed in onResult().
+            if (null != mGoogleApiClient && mGoogleApiClient.isConnected()) {
+                LocationServices.GeofencingApi.addGeofences(
+                        mGoogleApiClient,
+                        builder.build(),
+                        intent
+                ).setResultCallback(callback);
+            }// Result processed in onResult().
         } catch (SecurityException securityException) {
             // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
             //logSecurityException(securityException);

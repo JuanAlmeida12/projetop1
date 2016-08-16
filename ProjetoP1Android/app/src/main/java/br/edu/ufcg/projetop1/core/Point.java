@@ -1,5 +1,6 @@
 package br.edu.ufcg.projetop1.core;
 
+import com.google.firebase.database.Exclude;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 import org.json.JSONObject;
@@ -25,9 +26,7 @@ public class Point {
 
     public int score;
 
-
     public Point() {
-
     }
 
     public Point(Map<String, String> description, Double lat, Double lng, String placeName, List<String> tags, int score) {
@@ -38,4 +37,5 @@ public class Point {
         this.tags = tags;
         this.score = score;
     }
+
 }

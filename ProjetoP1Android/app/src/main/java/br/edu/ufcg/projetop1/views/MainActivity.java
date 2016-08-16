@@ -2,6 +2,7 @@ package br.edu.ufcg.projetop1.views;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -55,6 +56,7 @@ import java.util.List;
 import java.util.UUID;
 
 import br.edu.ufcg.projetop1.R;
+import br.edu.ufcg.projetop1.fragments.BadgesFragment;
 import br.edu.ufcg.projetop1.fragments.MapFragment;
 
 public class MainActivity extends AppCompatActivity
@@ -68,10 +70,12 @@ public class MainActivity extends AppCompatActivity
     private Location mLastLocation;
     private FirebaseDatabase database;
     public static List<String> userPhotos = new ArrayList<String>();
+    private boolean isHome;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -96,6 +100,8 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        navigationView.getMenu().getItem(0).setChecked(true);
+        setFragment(MapFragment.getNewInstance(false));
 
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final View header = navigationView.getHeaderView(0);
@@ -134,8 +140,6 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
-
-        setFragment(MapFragment.getNewInstance(false));
 
     }
 
@@ -180,7 +184,13 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            if (isHome) {
+                finish();
+            } else {
+                NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+                navigationView.getMenu().getItem(0).setChecked(true);
+            }
+            //super.onBackPressed();
         }
     }
 
@@ -235,12 +245,19 @@ public class MainActivity extends AppCompatActivity
             dispatchTakePictureIntent();
         } else if (id == R.id.nav_gallery) {
             setFragment(MapFragment.getNewInstance(true));
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_badges) {
+            setFragment(BadgesFragment.newInstance());
 
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
+        }
+        if (id == R.id.nav_home) {
+            setFragment(MapFragment.getNewInstance(false));
+            isHome = true;
+        } else {
+            isHome = false;
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -254,6 +271,7 @@ public class MainActivity extends AppCompatActivity
             sendPhoto(data);
         }
     }
+
 
     private void sendPhoto(Intent data) {
         final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();

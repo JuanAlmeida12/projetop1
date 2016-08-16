@@ -56,20 +56,20 @@ function showPosition(position) {
         position.coords.latitude, position.coords.longitude);
 
     map.setCenter(mposition);
-    // var placeData = {
-    //     placeName: "Trem Maria Fumaça",
-    //     description: {
-    //         en: "Train Steam train",
-    //         pt: "Trem Maria Fumaça"
-    //     },
-    //     lat: -7.228926,
-    //     lng: -35.884745,
-    //     tags: ["monument","historic"]
-    // };
-    // var newPlaceKey = firebase.database().ref().child('places').push().key;
-    // var updates = {};
-    // updates['/posts/' + newPlaceKey] = placeData;
-    // firebase.database().ref().update(updates);
+    var placeData = {
+        placeName: "Embedded",
+        description: {
+            en: "Embedded Lab",
+            pt: "Embedded Lab"
+        },
+        lat: -7.2123825,
+        lng: -35.9082391,
+        tags: ["lab"]
+    };
+    var newPlaceKey = firebase.database().ref().child('places').push().key;
+    var updates = {};
+    updates['/posts/' + newPlaceKey] = placeData;
+    firebase.database().ref().update(updates);
 
     firebase.database().ref('posts/').on('value', function(snapshot) {
             console.log(snapshot.val());

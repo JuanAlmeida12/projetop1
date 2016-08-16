@@ -44,4 +44,13 @@
     <string name="loading">Loading</string>
     <string name="storageref">gs://worlddiscovery-f60f3.appspot.com</string>
     <string name="score">Score: </string>
+    <string name="badge_first_point">Your first point of type:</string>
+    <string name="badge_average_point">You visited 5 point of type: </string>
+    <string name="badge_avanced_point">You visited 10 point of type: </string>
+    <string name="first">First </string>
+    <string name="average">Average explorer of </string>
+    <string name="avanced">Avanced explorer of </string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -142,7 +142,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     DatabaseReference myRef = database.getReference("user-place");
                     String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     myRef.child(userid).child(point.placeName).child("visited").setValue(true);
-                    myRef.child(userid).child(point.placeName).child("score").setValue(point.score);
+                    myRef.child(userid).child(point.placeName).child("point").setValue(point);
                     return null;
                 }
             }.execute();

@@ -66,6 +66,7 @@ import br.edu.ufcg.projetop1.core.Point;
 import br.edu.ufcg.projetop1.dialogs.PhotoDialog;
 import br.edu.ufcg.projetop1.services.GeofenceTransitionsIntentService;
 import br.edu.ufcg.projetop1.utils.MapUtil;
+import br.edu.ufcg.projetop1.utils.ScoreUtils;
 import br.edu.ufcg.projetop1.views.MainActivity;
 
 public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMarkerClickListener {
@@ -133,48 +134,61 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        scoreCount();
+        ScoreUtils.scoreCount(getContext(), database, scoreView);
 
         return mView;
     }
 
-    private void scoreCount() {
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference myRefplaces = database.getReference("user-place").child(userid);
-        ChildEventListener visitedListener = new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                if (dataSnapshot.hasChild("score")) {
-                    score = dataSnapshot.child("score").getValue(Integer.class);
-                }
-                if (scoreView != null) {
-                    scoreView.setText(getString(R.string.score) + score);
-                }
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-        myRefplaces.addChildEventListener(visitedListener);
+    @Override
+    public void onDestroy() {
+        if (null != mGoogleApiClient && mGoogleApiClient.isConnected())
+            LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, getGeofencePendingIntent());
+        super.onDestroy();
     }
+
+    @Override
+    public void onDetach() {
+        if (null != mGoogleApiClient && mGoogleApiClient.isConnected())
+            LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, getGeofencePendingIntent());
+        super.onDetach();
+    }
+    //    private void scoreCount() {
+//        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        DatabaseReference myRefplaces = database.getReference("user-place").child(userid);
+//        ChildEventListener visitedListener = new ChildEventListener() {
+//            @Override
+//            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+//
+//                if (dataSnapshot.hasChild("score")) {
+//                    score = dataSnapshot.child("score").getValue(Integer.class);
+//                }
+//                if (scoreView != null) {
+//                    scoreView.setText(getString(R.string.score) + score);
+//                }
+//            }
+//
+//            @Override
+//            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onChildRemoved(DataSnapshot dataSnapshot) {
+//
+//            }
+//
+//            @Override
+//            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        };
+//        myRefplaces.addChildEventListener(visitedListener);
+//    }
 
     private void setPointsOnMap() {
         DatabaseReference myRef = database.getReference("posts");
@@ -409,6 +423,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
 
         // Create and show the dialog.
         DialogFragment newFragment = PhotoDialog.newInstance(9, id);
+        newFragment.setCancelable(true);
         newFragment.show(ft, "dialog");
     }
 }
