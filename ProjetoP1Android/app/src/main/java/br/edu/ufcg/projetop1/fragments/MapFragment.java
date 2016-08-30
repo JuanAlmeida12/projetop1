@@ -310,7 +310,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
 
     private Bitmap getMarkerBitmapFromView(Bitmap content_image) {
 
-        MyImageView customMarkerView = (MyImageView) ((LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.marker_custom, null);
+        MyImageView customMarkerView = (MyImageView) ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.marker_custom, null);
 
         customMarkerView.setResourseBitmap(content_image);
         return createDrawableFromView(getActivity(), customMarkerView);
@@ -422,7 +422,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         ft.addToBackStack(null);
 
         // Create and show the dialog.
-        DialogFragment newFragment = PhotoDialog.newInstance(9, id);
+        DialogFragment newFragment = PhotoDialog.newInstance(9, id,false);
         newFragment.setCancelable(true);
         newFragment.show(ft, "dialog");
     }

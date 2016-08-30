@@ -1,7 +1,11 @@
 package br.edu.ufcg.projetop1.views;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -10,6 +14,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,6 +23,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -28,9 +34,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -56,12 +64,19 @@ import java.util.List;
 import java.util.UUID;
 
 import br.edu.ufcg.projetop1.R;
+import br.edu.ufcg.projetop1.adapters.UsersAdapter;
+import br.edu.ufcg.projetop1.core.QuickstartPreferences;
 import br.edu.ufcg.projetop1.fragments.BadgesFragment;
 import br.edu.ufcg.projetop1.fragments.MapFragment;
+import br.edu.ufcg.projetop1.fragments.SearchUser;
+import br.edu.ufcg.projetop1.fragments.UserProfile;
+import br.edu.ufcg.projetop1.services.RegistrationIntentService;
+import br.edu.ufcg.projetop1.utils.FollowUtil;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     private static final String TAG = "MainActivity";
     public static FragmentManager fragmentManager;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
@@ -71,6 +86,8 @@ public class MainActivity extends AppCompatActivity
     private FirebaseDatabase database;
     public static List<String> userPhotos = new ArrayList<String>();
     private boolean isHome;
+    private BroadcastReceiver mRegistrationBroadcastReceiver;
+    private boolean isReceiverRegistered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,11 +96,29 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         fragmentManager = getSupportFragmentManager();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
         storage = FirebaseStorage.getInstance();
         database = FirebaseDatabase.getInstance();
 
+        mRegistrationBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                SharedPreferences sharedPreferences =
+                        PreferenceManager.getDefaultSharedPreferences(context);
+                boolean sentToken = sharedPreferences
+                        .getBoolean(QuickstartPreferences.SENT_TOKEN_TO_SERVER, false);
+
+            }
+        };
+        registerReceiver();
+
+        if (checkPlayServices()) {
+            // Start IntentService to register this application with GCM.
+            Intent intent = new Intent(this, RegistrationIntentService.class);
+            startService(intent);
+        }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -110,6 +145,8 @@ public class MainActivity extends AppCompatActivity
 
         TextView email = (TextView) header.findViewById(R.id.user_email);
         email.setText(user.getEmail());
+
+        FollowUtil.listenFollowers();
 
         userPictureNav(user, header);
 
@@ -216,7 +253,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_find_users) {
+            setFragment(SearchUser.newInstance());
             return true;
         }
 
@@ -272,6 +310,21 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private boolean checkPlayServices() {
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
+                        .show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+                finish();
+            }
+            return false;
+        }
+        return true;
+    }
 
     private void sendPhoto(Intent data) {
         final String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -302,8 +355,11 @@ public class MainActivity extends AppCompatActivity
                             .build();
                     taskSnapshot.getStorage().updateMetadata(metadata);
                 }
-                DatabaseReference myRef = database.getReference("user-photo");
+                DatabaseReference myRef = database.getReference("user-" +
+                        "photo");
                 myRef.child(userid).child(photoId).setValue(ref);
+//                DatabaseReference refActivity = database.getReference("user-activity");
+//                refActivity.child(userid).child(photoId).setValue(ref);
                 Log.e(TAG, downloadUrl.toString());
             }
         });
@@ -336,15 +392,33 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void downloadImages() {
-        String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        StorageReference storageRef = storage.getReferenceFromUrl(getString(R.string.storageref));
-        StorageReference photosRef = storageRef.child(userid);
-        photosRef.getBytes(Long.MAX_VALUE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        String action = intent.getAction();
+        if (action.equals(getString(R.string.action_user_info))) {
+            String uuid = intent.getStringExtra(UsersAdapter.UUID_KEY);
+            setFragment(UserProfile.newInstance(uuid));
+        }
+    }
 
-            }
-        });
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver();
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+        isReceiverRegistered = false;
+        super.onPause();
+    }
+
+    private void registerReceiver() {
+        if (!isReceiverRegistered) {
+            LocalBroadcastManager.getInstance(this).registerReceiver(mRegistrationBroadcastReceiver,
+                    new IntentFilter(QuickstartPreferences.REGISTRATION_COMPLETE));
+            isReceiverRegistered = true;
+        }
     }
 }

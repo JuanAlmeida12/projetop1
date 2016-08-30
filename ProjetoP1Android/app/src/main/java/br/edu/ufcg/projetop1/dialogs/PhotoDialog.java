@@ -12,6 +12,7 @@ import android.widget.TextView;
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.PhotoUser;
 import br.edu.ufcg.projetop1.fragments.MapFragment;
+import br.edu.ufcg.projetop1.fragments.UserProfile;
 
 /**
  * Created by root on 15/08/16.
@@ -23,12 +24,13 @@ public class PhotoDialog extends DialogFragment {
      * Create a new instance of MyDialogFragment, providing "num"
      * as an argument.
      */
-    public static PhotoDialog newInstance(int num, String id) {
+    public static PhotoDialog newInstance(int num, String id, Boolean isProfile) {
         PhotoDialog f = new PhotoDialog();
 
         // Supply num input as an argument.
         Bundle args = new Bundle();
         args.putInt("num", num);
+        args.putBoolean("isprofile", isProfile);
         args.putString("id", id);
         f.setArguments(args);
 
@@ -97,7 +99,12 @@ public class PhotoDialog extends DialogFragment {
         TextView descView = (TextView) v.findViewById(R.id.desc);
         View descLayer = v.findViewById(R.id.layer_descript);
 
-        PhotoUser photo = MapFragment.photoUserMap.get(getArguments().getString("id"));
+        PhotoUser photo;
+        if (getArguments().getBoolean("isprofile", false)) {
+            photo = UserProfile.photoUserMap.get(getArguments().getString("id"));
+        } else {
+            photo = MapFragment.photoUserMap.get(getArguments().getString("id"));
+        }
 
         photoView.setImageBitmap(photo.getPhoto());
         String desc = photo.getDescript();

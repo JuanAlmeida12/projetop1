@@ -4,11 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,8 +37,9 @@ public class BadgeUtil {
 
                 @Override
                 public void run() {
-                    while (running)
-                        for (Point point : myPoints) {
+                    while (running) {
+                        List<Point> points = new ArrayList<Point>(myPoints);
+                        for (Point point : points) {
                             for (String type : BADGES_TYPES)
                                 if (point.tags.contains(type) && !added.contains(point)) {
                                     added.add(point);
@@ -63,6 +61,7 @@ public class BadgeUtil {
 
                                 }
                         }
+                    }
                 }
             }).start();
         }
