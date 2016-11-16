@@ -12,6 +12,7 @@ public class UserInfo {
     public String name;
     public String email;
     public String uuid;
+    public String token;
 
     public UserInfo() {
     }

@@ -52,50 +52,77 @@ function getMyPlaces(callback) {
 }
 
 function showPosition(position) {
+    getWeather(position.coords.latitude,position.coords.longitude);
     var mposition = new google.maps.LatLng(
         position.coords.latitude, position.coords.longitude);
 
     map.setCenter(mposition);
-    var placeData = {
-        placeName: "Embedded",
-        description: {
-            en: "Embedded Lab",
-            pt: "Embedded Lab"
-        },
-        lat: -7.2123825,
-        lng: -35.9082391,
-        tags: ["lab"]
+    var request = {
+      location: mposition,
+      radius: '5000',
+      types: ['natural_feature','library','airport','art_gallery','campground','stadium','zoo','place_of_worship']
     };
-    var newPlaceKey = firebase.database().ref().child('places').push().key;
-    var updates = {};
-    updates['/posts/' + newPlaceKey] = placeData;
-    firebase.database().ref().update(updates);
+    var service = new google.maps.places.PlacesService(map);
+    service.nearbySearch(request, callback);
+    // var placeData = {
+    //     placeName: "Embedded",
+    //     description: {
+    //         en: "Embedded Lab",
+    //         pt: "Embedded Lab"
+    //     },
+    //     lat: -7.2123825,
+    //     lng: -35.9082391,
+    //     tags: ["lab"]
+    // };
+    // var newPlaceKey = firebase.database().ref().child('places').push().key;
+    // var updates = {};
+    // updates['/posts/' + newPlaceKey] = placeData;
+    // firebase.database().ref().update(updates);
 
-    firebase.database().ref('posts/').on('value', function(snapshot) {
-            console.log(snapshot.val());
-            var places = {};
-            for (key in snapshot.val()){
-                console.log(snapshot.val()[key]);
-                createMarker(snapshot.val()[key],false);
-            }
-        });
+    // firebase.database().ref('posts/').on('value', function(snapshot) {
+    //         //console.log(snapshot.val());
+    //         var places = {};
+    //         for (key in snapshot.val()){
+    //             //console.log(snapshot.val()[key]);
+    //             createMarker(snapshot.val()[key],false);
+    //         }
+    //     });
+}
 
+function createMarkers(places) {
+  var bounds = new google.maps.LatLngBounds();
+  var placesList = document.getElementById('places');
 
+  for (var i = 0, place; place = places[i]; i++) {
+    var image = {
+      url: place.icon,
+      size: new google.maps.Size(71, 71),
+      origin: new google.maps.Point(0, 0),
+      anchor: new google.maps.Point(17, 34),
+      scaledSize: new google.maps.Size(25, 25)
+    };
 
+    var marker = new google.maps.Marker({
+      map: map,
+      icon: image,
+      title: place.name,
+      position: place.geometry.location
+    });
+  }
 }
 
 function callback(results, status, pagination) {
-    getMyPlaces(function(places) {
         if (status == google.maps.places.PlacesServiceStatus.OK) {
-            for (var i = 0; i < results.length; i++) {
-                var visited = places.hasOwnProperty(results[i].id);
-                createMarker(results[i], visited);
-            }
+          console.log("aqui place");
+          createMarkers(results);
+            // for (var i = 0; i < results.length; i++) {
+            //     var visited = places.hasOwnProperty(results[i].id);
+            //     createMarker(results[i], visited);
+            // }
         if (pagination.hasNextPage) {
             pagination.nextPage();
         }
         }
-    });
 }
 
 function createMarker(place, visited) {

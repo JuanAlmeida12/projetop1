@@ -1,0 +1,113 @@
+{
+  "project_info": {
+    "project_number": "854911701416",
+    "firebase_url": "https://worlddiscovery-f60f3.firebaseio.com",
+    "project_id": "worlddiscovery-f60f3",
+    "storage_bucket": "worlddiscovery-f60f3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854911701416:android:8aef312fad9e539e",
+        "android_client_info": {
+          "package_name": "br.edu.ufcg.projetop1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854911701416-mkls8ib8pj2jdnia5niemo6to9vn6n7d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.edu.ufcg.projetop1",
+            "certificate_hash": "FE30F4F396721BC6DA535B24A9E5D9E0376C6714"
+          }
+        },
+        {
+          "client_id": "854911701416-af661paku78k1cbitgdlnt9ku9h6ef4b.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.edu.ufcg.projetop1",
+            "certificate_hash": "781FD7209FC3AD14190999FA55A354F2D7C509B0"
+          }
+        },
+        {
+          "client_id": "854911701416-qnkuciadbda74610k21luqatvnmkev39.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.edu.ufcg.projetop1",
+            "certificate_hash": "722895DA6A41920105F26D05D2496DFA616DA1DE"
+          }
+        },
+        {
+          "client_id": "854911701416-91b8472u3me7d1agmvhpv6relftgcend.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.edu.ufcg.projetop1",
+            "certificate_hash": "3E9A42E83B99631E9905774FDA9AADF120FBE7E8"
+          }
+        },
+        {
+          "client_id": "854911701416-5ci5315p2s8am0cmrnqvvm8pa41lsd8h.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "854911701416-2jql1uotrrnn9tpd1fn3brdcfmk7uqtt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx1xK9LapmbxJuho0jBTPW0X8j0cro1K0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854911701416:android:3854f385a22950cb",
+        "android_client_info": {
+          "package_name": "p1.edu.ufcg.worlddiscovery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854911701416-5ci5315p2s8am0cmrnqvvm8pa41lsd8h.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "854911701416-2jql1uotrrnn9tpd1fn3brdcfmk7uqtt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBx1xK9LapmbxJuho0jBTPW0X8j0cro1K0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

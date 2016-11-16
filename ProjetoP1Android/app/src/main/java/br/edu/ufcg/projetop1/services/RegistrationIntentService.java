@@ -81,9 +81,9 @@ public class RegistrationIntentService extends IntentService {
     private void sendRegistrationToServer(String token) {
         // Add custom implementation, as needed.
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("user-token");
+        DatabaseReference myRef = database.getReference("user-info");
         String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        myRef.child(userid).setValue(token);
+        myRef.child(userid).child("token").setValue(token);
     }
 
     /**

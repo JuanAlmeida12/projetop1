@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">WorldDiscovery</string>
+    <string name="request_id_token">854911701416-2jql1uotrrnn9tpd1fn3brdcfmk7uqtt.apps.googleusercontent.com</string>
+    <string name="welcome">Wellcome</string>
+    <string name="failed_signin">Failed SignIn</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="score">Score</string>
+    <string name="last_login">Last Login</string>
+    <string name="never">Never</string>
+    <string name="since">Since</string>
+    <string name="places">Places</string>
+    <string name="badges">Badges</string>
+
+    <!-- Error strings -->
+    <string name="not_connected">GoogleApiClient no yet connected. Try again.</string>
+    <string name="geofence_not_available">Geofence service is not available now</string>
+    <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
+    <string name="geofence_too_many_pending_intents">
+        You have provided too many PendingIntents to the addGeofences() call
+    </string>
+    <string name="unknown_geofence_error">
+        Unknown error: the Geofence service is not available now
+    </string>
+    <string name="geofence_transition_invalid_type">
+        Geofence transition error: invalid transition type %1$d
+    </string>
+
+    <!-- Transition type strings -->
+    <string name="geofence_transition_entered">Entered</string>
+    <string name="geofence_transition_exited">Exited</string>
+    <string name="unknown_geofence_transition">Unknown Transition</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="preference_geofece">p1.edu.ufcg.worlddiscovery.GEOFENCE_BINDING</string>
+    <string name="next_wellcome">Next</string>
+    <string name="finish">Finish</string>
+    <string name="back_wellcome">Back</string>
+    <string name="first_use_key">first_use</string>
+    <string name="preference_first_use">p1.edu.ufcg.worlddiscovery.FIRST_USE</string>
+    <string name="search_hint">Search...</string>
+    <string name="user_type">User</string>
+    <string name="place_type">Place</string>
+    <string name="title_userdetail_list">Users</string>
+    <string name="title_userdetail_detail">UserDetail Detail</string>
+    <string name="user_image_search">user_image_transition</string>
+    <string name="about_detail">About</string>
+    <string name="job_about">Job</string>
+    <string name="gender_about">Gender</string>
+    <string name="address_about">Address</string>
+    <string name="message_about">Message</string>
+    <string name="not_specified">Not specified</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="places_fab">Places</string>
+    <string name="photos">Photos</string>
+    <string name="edit">Edit</string>
+    <string name="follow">Follow</string>
+    <string name="type_your_message">Type your Message</string>
+    <string name="activities">Activities</string>
+    <string name="my_profile">My Profile</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="unfollow">Unfollow</string>
+</resources>

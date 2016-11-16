@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <!-- Meta, title, CSS, favicons, etc. -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>World Discovery | Profile</title>
+
+    <!-- Bootstrap -->
+    <link href="../vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="../vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Custom Theme Style -->
+    <link href="../build/css/custom.css" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places&key=AIzaSyDwxt5GqFKborDsCngWP1_znK7Y8mP5SrY"></script>
+    <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase.js"></script>
+    <script>
+      var id = JSON.parse('<%- JSON.stringify(profile) %>');
+    </script>
+    <link rel="icon" href="../images/wdicon.png">
+    <script src="../js/profile.js"></script>
+    <script src="../js/search_button.js"></script>
+
+  </head>
+
+  <body class="nav-md">
+    <div class="container body">
+      <div class="main_container">
+        <div class="col-md-3 left_col">
+          <div class="left_col scroll-view">
+            <div class="navbar nav_title" style="border: 0;">
+              <a href="/dashboard" class="site_title"><i class="fa fa-globe"></i> <span>World Discovery</span></a>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <!-- menu profile quick info -->
+            <div class="profile">
+              <div class="profile_pic">
+                <img id="profile_image" src="images/img.jpg" alt="..." class="img-circle profile_img">
+              </div>
+              <div class="profile_info">
+                <span>Welcome,</span>
+                <h2 id="profile_name"></h2>
+              </div>
+            </div>
+            <!-- /menu profile quick info -->
+
+            <br />
+
+            <!-- sidebar menu -->
+            <div id="sidebar-menu" class="main_menu_side hidden-print main_menu">
+              <div class="menu_section">
+                <h3>General</h3>
+                <ul class="nav side-menu">
+                  <li><a href="/dashboard"><i class="fa fa-home"></i> Dashboard </a>
+                  </li>
+                  <li><a href="javascript:myProfile()"><i class="fa fa-user"></i> Profile</a>
+                  </li>
+                  <li><a><i class="fa fa-trophy"></i> Badges</a>
+                  </li>
+                  <li><a><i class="fa fa-map-marker"></i> Places</span></a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <!-- /sidebar menu -->
+
+            <!-- /menu footer buttons -->
+            <div class="sidebar-footer hidden-small">
+              <a data-toggle="tooltip" data-placement="top" title="Settings">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="FullScreen">
+                <span class="glyphicon glyphicon-fullscreen" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Lock">
+                <span class="glyphicon glyphicon-eye-close" aria-hidden="true"></span>
+              </a>
+              <a data-toggle="tooltip" data-placement="top" title="Logout">
+                <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+              </a>
+            </div>
+            <!-- /menu footer buttons -->
+          </div>
+        </div>
+
+        <!-- top navigation -->
+        <div class="top_nav">
+          <div class="nav_menu">
+            <nav class="" role="navigation">
+              <div class="nav toggle">
+                <a id="menu_toggle"><i class="fa fa-bars"></i></a>
+              </div>
+
+
+              <ul class="nav navbar-nav navbar-right">
+                <li class="">
+                  <a id="nav_user_profile" href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <img id="nav_user_image" src="images/img.jpg" alt="">
+                  </a>
+                  <ul class="dropdown-menu dropdown-usermenu pull-right">
+                    <li><a href="javascript:myProfile();"> Profile</a></li>
+                    <li>
+                      <a href="javascript:;">
+                        <span class="badge bg-red pull-right">50%</span>
+                        <span>Settings</span>
+                      </a>
+                    </li>
+                    <li><a href="javascript:;">Help</a></li>
+                    <li><a href="javascript:signOut()"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                  </ul>
+                </li>
+
+                <li role="presentation" class="dropdown">
+                  <a href="javascript:;" class="dropdown-toggle info-number" data-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-envelope-o"></i>
+                    <span id="message_count"class="badge bg-green">1</span>
+                  </a>
+                  <ul id="menu1" class="dropdown-menu list-unstyled msg_list" role="menu">
+                    <li>
+                      <a>
+                        <span class="image"><img src="images/img.jpg" alt="Profile Image" /></span>
+                        <span>
+                          <span>John Smith</span>
+                          <span class="time">3 mins ago</span>
+                        </span>
+                        <span class="message">
+                          Film festivals used to be do-or-die moments for movie makers. They were where...
+                        </span>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+                <div style="padding-top:10px;width:300px;height:30px"class="form-group pull-right top_search">
+                  <div class="input-group">
+                    <input type="text" class="form-control" id="search_box" placeholder="Search for...">
+                    <span class="input-group-btn">
+                      <button onclick="searchButton()" class="btn btn-default" type="button">Go!</button>
+                    </span>
+                  </div>
+                </div>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <!-- /top navigation -->
+
+        <!-- page content -->
+        <div class="right_col" role="main">
+          <div class="">
+            <div class="page-title">
+              <div class="title_left">
+                <h3>User Profile</h3>
+              </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <div class="row">
+              <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="x_panel">
+                  <div class="x_title">
+                    <h2>User Report <small>Activity report</small></h2>
+                    <ul class="nav navbar-right panel_toolbox">
+                      <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                      </li>
+                      <li><a class="close-link"><i class="fa fa-close"></i></a>
+                      </li>
+                    </ul>
+                    <div class="clearfix"></div>
+                  </div>
+                  <div class="x_content">
+
+                    <div class="col-md-3 col-sm-3 col-xs-12 profile_left">
+
+                      <div class="profile_img">
+
+                        <!-- end of image cropping -->
+                        <div id="crop-avatar">
+                          <!-- Current avatar -->
+                          <img id="profile_picture"class="img-responsive avatar-view" src="../images/picture.jpg" alt="Avatar" title="Change the avatar">
+
+                          <!-- Cropping modal -->
+                          <div class="modal fade" id="avatar-modal" aria-hidden="true" aria-labelledby="avatar-modal-label" role="dialog" tabindex="-1">
+                            <div class="modal-dialog modal-lg">
+                              <div class="modal-content">
+                                <form class="avatar-form" action="crop.php" enctype="multipart/form-data" method="post">
+                                  <div class="modal-header">
+                                    <button class="close" data-dismiss="modal" type="button">&times;</button>
+                                    <h4 class="modal-title" id="avatar-modal-label">Change Avatar</h4>
+                                  </div>
+                                  <div class="modal-body">
+                                    <div class="avatar-body">
+
+                                      <!-- Upload image and data -->
+                                      <div class="avatar-upload">
+                                        <input class="avatar-src" name="avatar_src" type="hidden">
+                                        <input class="avatar-data" name="avatar_data" type="hidden">
+                                        <label for="avatarInput">Local upload</label>
+                                        <input class="avatar-input" id="avatarInput" name="avatar_file" type="file">
+                                      </div>
+
+                                      <!-- Crop and preview -->
+                                      <div class="row">
+                                        <div class="col-md-9">
+                                          <div class="avatar-wrapper"></div>
+                                        </div>
+                                        <div class="col-md-3">
+                                          <div class="avatar-preview preview-lg"></div>
+                                          <div class="avatar-preview preview-md"></div>
+                                          <div class="avatar-preview preview-sm"></div>
+                                        </div>
+                                      </div>
+
+                                      <div class="row avatar-btns">
+                                        <div class="col-md-9">
+                                          <div class="btn-group">
+                                            <button class="btn btn-primary" data-method="rotate" data-option="-90" type="button" title="Rotate -90 degrees">Rotate Left</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="-15" type="button">-15deg</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="-30" type="button">-30deg</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="-45" type="button">-45deg</button>
+                                          </div>
+                                          <div class="btn-group">
+                                            <button class="btn btn-primary" data-method="rotate" data-option="90" type="button" title="Rotate 90 degrees">Rotate Right</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="15" type="button">15deg</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="30" type="button">30deg</button>
+                                            <button class="btn btn-primary" data-method="rotate" data-option="45" type="button">45deg</button>
+                                          </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                          <button class="btn btn-primary btn-block avatar-save" type="submit">Done</button>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <!-- <div class="modal-footer">
+                                                    <button class="btn btn-default" data-dismiss="modal" type="button">Close</button>
+                                                  </div> -->
+                                </form>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- /.modal -->
+
+                          <!-- Loading state -->
+                          <div class="loading" aria-label="Loading" role="img" tabindex="-1"></div>
+                        </div>
+                        <!-- end of image cropping -->
+
+                      </div>
+                      <h3 id="profilepage_name">Samuel Doe</h3>
+
+                      <ul class="list-unstyled user_data">
+                        <li id="user_location"><i class="fa fa-map-marker user-profile-icon"></i></li>
+
+                        <li id="user_job">
+                          <i class="fa fa-briefcase user-profile-icon"></i></li>
+
+                        <li id="user_gender">
+                          <i class="fa fa-venus-mars user-profile-icon"></i></li>
+
+                        <li>
+                          <div id="user_message" class="message_wrapper ">
+                            <i class="fa fa-commenting user-profile-icon"></i>
+                          </div>
+                        </li>
+                      </ul>
+
+                      <a id="bt_follow" onclick="followUser()"class="btn btn-info"><i class="fa fa-user-plus m-right-xs"></i> Follow</a>
+                      <a id="bt_edit" onclick="edit()"class="btn btn-success"><i class="fa fa-edit m-right-xs"></i>Edit Profile</a>
+                      <br />
+
+                      <!-- start skills -->
+
+                    </div>
+                    <div class="col-md-9 col-sm-9 col-xs-12">
+
+                      <div class="profile_title">
+                        <div class="col-md-6">
+                          <h2>User Activity Report</h2>
+                        </div>
+                      </div>
+                      <!-- start of user-activity-graph -->
+                      <div id="divmesh">
+                        <div class="x_panel">
+                          <div class="x_title">
+                            <h2>Photos</h2>
+                            <ul class="nav navbar-right panel_toolbox">
+                              <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                              </li>
+                              <li><a class="close-link"><i class="fa fa-close"></i></a>
+                              </li>
+                            </ul>
+                            <div class="clearfix"></div>
+                          </div>
+                          <div class="x_content">
+                            <div id="myCarousel" class="carousel slide center-block" data-ride="carousel">
+                              <!-- Indicators -->
+                              <ol id="carousel_indice" class="carousel-indicators">
+
+                              </ol>
+
+                              <!-- Wrapper for slides -->
+                              <div id="carousel_images" class="carousel-inner" role="listbox">
+
+                              </div>
+
+                              <!-- Left and right controls -->
+                              <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                              </a>
+                              <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div id="map_profile" style="width:100%; height:280px;"></div>
+                      </div>
+                      <!-- end of user-activity-graph -->
+
+                      <div class="" role="tabpanel" data-example-id="togglable-tabs">
+                        <ul id="myTab" class="nav nav-tabs bar_tabs" role="tablist">
+                          <li role="presentation" class="active"><a href="#tab_content1" id="home-tab" role="tab" data-toggle="tab" aria-expanded="true">Recent Activity</a>
+                          </li>
+                          <li role="presentation" class=""><a href="#tab_content2" role="tab" id="profile-tab" data-toggle="tab" aria-expanded="false">Badges</a>
+                          </li>
+                          <li role="presentation" class=""><a href="#tab_content3" role="tab" id="profile-tab2" data-toggle="tab" aria-expanded="false">Places</a>
+                          </li>
+                        </ul>
+                        <div id="myTabContent" class="tab-content">
+                          <div role="tabpanel" class="tab-pane fade active in" id="tab_content1" aria-labelledby="home-tab">
+
+                            <!-- start recent activity -->
+                            <ul id="activities" class="messages">
+                            </ul>
+                            <!-- end recent activity -->
+
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade" id="tab_content2" aria-labelledby="profile-tab">
+
+                            <!-- start user projects -->
+                            <table id="tableBadge"class="data table table-striped no-margin">
+                              <thead>
+                                <tr>
+                                  <th>Badge Name</th>
+                                  <th>Description</th>
+                                  <th>Meta</th>
+                                  <th>Progress</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                            </table>
+                            <!-- end user projects -->
+
+                          </div>
+                          <div role="tabpanel" class="tab-pane fade" id="tab_content3" aria-labelledby="profile-tab">
+                            <table id="tablePlaces"class="data table table-striped no-margin">
+                              <thead>
+                                <tr>
+                                  <th>#</th>
+                                  <th>Place</th>
+                                  <th>Description</th>
+                                  <th>Visited at</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /page content -->
+
+        <!-- footer content -->
+        <footer>
+          <div class="pull-right">
+            Word Discovery
+          </div>
+          <div class="clearfix"></div>
+        </footer>
+        <!-- /footer content -->
+      </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="../vendors/jquery/dist/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="../vendors/bootstrap/dist/js/bootstrap.min.js"></script>
+    <!-- FastClick -->
+    <script src="../vendors/fastclick/lib/fastclick.js"></script>
+    <!-- NProgress -->
+    <script src="../vendors/nprogress/nprogress.js"></script>
+    <!-- morris.js -->
+    <script src="../vendors/raphael/raphael.min.js"></script>
+    <script src="../vendors/morris.js/morris.min.js"></script>
+    <!-- bootstrap-progressbar -->
+    <script src="../vendors/bootstrap-progressbar/bootstrap-progressbar.min.js"></script>
+    <!-- bootstrap-daterangepicker -->
+    <script src="js/moment/moment.min.js"></script>
+    <script src="js/datepicker/daterangepicker.js"></script>
+
+    <!-- Custom Theme Scripts -->
+    <script src="../build/js/custom.min.js"></script>
+
+    <script>
+      $(function() {
+        Morris.Bar({
+          element: 'graph_bar',
+          data: [
+            { "period": "Jan", "Hours worked": 80 },
+            { "period": "Feb", "Hours worked": 125 },
+            { "period": "Mar", "Hours worked": 176 },
+            { "period": "Apr", "Hours worked": 224 },
+            { "period": "May", "Hours worked": 265 },
+            { "period": "Jun", "Hours worked": 314 },
+            { "period": "Jul", "Hours worked": 347 },
+            { "period": "Aug", "Hours worked": 287 },
+            { "period": "Sep", "Hours worked": 240 },
+            { "period": "Oct", "Hours worked": 211 }
+          ],
+          xkey: 'period',
+          hideHover: 'auto',
+          barColors: ['#26B99A', '#34495E', '#ACADAC', '#3498DB'],
+          ykeys: ['Hours worked', 'sorned'],
+          labels: ['Hours worked', 'SORN'],
+          xLabelAngle: 60,
+          resize: true
+        });
+
+        $MENU_TOGGLE.on('click', function() {
+          $(window).resize();
+        });
+      });
+    </script>
+
+    <!-- datepicker -->
+    <script type="text/javascript">
+      $(document).ready(function() {
+
+        var cb = function(start, end, label) {
+          console.log(start.toISOString(), end.toISOString(), label);
+          $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+          //alert("Callback has fired: [" + start.format('MMMM D, YYYY') + " to " + end.format('MMMM D, YYYY') + ", label = " + label + "]");
+        }
+
+        var optionSet1 = {
+          startDate: moment().subtract(29, 'days'),
+          endDate: moment(),
+          minDate: '01/01/2012',
+          maxDate: '12/31/2015',
+          dateLimit: {
+            days: 60
+          },
+          showDropdowns: true,
+          showWeekNumbers: true,
+          timePicker: false,
+          timePickerIncrement: 1,
+          timePicker12Hour: true,
+          ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+            'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+          },
+          opens: 'left',
+          buttonClasses: ['btn btn-default'],
+          applyClass: 'btn-small btn-primary',
+          cancelClass: 'btn-small',
+          format: 'MM/DD/YYYY',
+          separator: ' to ',
+          locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Clear',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+          }
+        };
+        $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+        $('#reportrange').daterangepicker(optionSet1, cb);
+        $('#reportrange').on('show.daterangepicker', function() {
+          console.log("show event fired");
+        });
+        $('#reportrange').on('hide.daterangepicker', function() {
+          console.log("hide event fired");
+        });
+        $('#reportrange').on('apply.daterangepicker', function(ev, picker) {
+          console.log("apply event fired, start/end dates are " + picker.startDate.format('MMMM D, YYYY') + " to " + picker.endDate.format('MMMM D, YYYY'));
+        });
+        $('#reportrange').on('cancel.daterangepicker', function(ev, picker) {
+          console.log("cancel event fired");
+        });
+        $('#options1').click(function() {
+          $('#reportrange').data('daterangepicker').setOptions(optionSet1, cb);
+        });
+        $('#options2').click(function() {
+          $('#reportrange').data('daterangepicker').setOptions(optionSet2, cb);
+        });
+        $('#destroy').click(function() {
+          $('#reportrange').data('daterangepicker').remove();
+        });
+      });
+    </script>
+    <script src="../js/map_profile.js"></script>
+    <!-- /datepicker -->
+  </body>
+</html>

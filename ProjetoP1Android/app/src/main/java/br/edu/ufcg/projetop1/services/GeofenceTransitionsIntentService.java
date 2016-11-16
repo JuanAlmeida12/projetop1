@@ -25,6 +25,8 @@ import java.util.List;
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.core.GeofenceErrorMessages;
 import br.edu.ufcg.projetop1.core.Point;
+import br.edu.ufcg.projetop1.core.UserAction;
+import br.edu.ufcg.projetop1.utils.ActionUtils;
 import br.edu.ufcg.projetop1.utils.MapUtil;
 import br.edu.ufcg.projetop1.views.MainActivity;
 
@@ -143,6 +145,9 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     String userid = FirebaseAuth.getInstance().getCurrentUser().getUid();
                     myRef.child(userid).child(point.placeName).child("visited").setValue(true);
                     myRef.child(userid).child(point.placeName).child("point").setValue(point);
+                    DatabaseReference refAction = database.getReference("action");
+                    UserAction action = new UserAction(userid, ActionUtils.ACTION_NEW_PLACE, point.placeName);
+                    refAction.push().setValue(action);
                     return null;
                 }
             }.execute();
@@ -164,7 +169,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
 
             // Define the notification settings.
-            builder.setSmallIcon(R.drawable.wdicon)
+            builder.setSmallIcon(R.drawable.wdicon_white)
                     // In a real app, you may want to use a library like Volley
                     // to decode the Bitmap.
                     .setLargeIcon(BitmapFactory.decodeResource(getResources(),

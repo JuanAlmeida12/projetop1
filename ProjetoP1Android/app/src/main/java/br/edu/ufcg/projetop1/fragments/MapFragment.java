@@ -141,9 +141,9 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         if (null != mGoogleApiClient && mGoogleApiClient.isConnected())
             LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, getGeofencePendingIntent());
-        super.onDestroy();
     }
 
     @Override

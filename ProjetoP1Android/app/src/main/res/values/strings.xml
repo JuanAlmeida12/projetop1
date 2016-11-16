@@ -56,4 +56,11 @@
     <string name="action_user_info">br.edu.ufcg.projetop1.USER_INFO</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
+    <string name="follow_notification_title">New Follower</string>
+    <string name="follow_notification_message">You have a new follower</string>
+    <string name="follow_notification_body_1">"The user "</string>
+    <string name="follow_notification_body_2">" started following you"</string>
+    <string name="started_following">Started following</string>
+    <string name="arrived_at">Arrived at</string>
+    <string name="new_photo">Added a new photo</string>
 </resources>

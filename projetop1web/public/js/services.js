@@ -12,35 +12,8 @@ function verifyUser(user) {
 	console.log("Entrei na func verifyUser");
 	if (user) {
 		console.log("logado");
-		$("#login").remove();
-		$("#nav-mobile").append(`
-			<li id='useriden'>
-				<div class="chip">
-		    		<img src="`+ user.photoURL +`" alt="Contact Person"> `
-		    		+ user.displayName +
-		  		`</div>
-	  		</li>
-			`);
-		$("#nav-mobile").append("<li id='chat'><a href='#'><i class='material-icons'>chat_bubble</i></a></li>");
-		$("#nav-mobile").append("<li id='logout'><a href='javascript:signOut()'>Sair</a></li>");
-		$("#user-image-slide-menu")
-        	.mouseover(function() {
-	            $(this).attr("src", user.photoURL);
-        })
 	} else {
-		$("#login").remove();
-		console.log("Nao logado");
-		$("#nav-mobile").append("<li id='login'><a href='javascript:authGoogle()'>Login</a></li>")
-		$("#logout").remove();
-		$("#useriden").remove();
-		$("#chat").remove();
 	}
-}
-
-$('.button-collapse').sideNav();
-
-function showSlideMenu() {
-	$('.button-collapse').sideNav('show');
 }
 
 firebase.auth().onAuthStateChanged(function(user) {
@@ -76,8 +49,4 @@ function authGoogle() {
 	  	var credential = error.credential;
 	  	// ...
 	});
-}
-
-function dismissStartCard(){
-	$('#cardinfo').remove();
 }

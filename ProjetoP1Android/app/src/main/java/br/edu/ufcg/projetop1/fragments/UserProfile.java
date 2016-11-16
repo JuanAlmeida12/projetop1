@@ -218,7 +218,7 @@ public class UserProfile extends Fragment implements ResultCallback<Status>, OnM
                             token.addValueEventListener(myValue);
 
                         } else {
-                            FollowUtil.follow(user.uuid);
+                            FollowUtil.follow(user.uuid, user.token);
                             follow.setText(R.string.unfollow);
                         }
                     }

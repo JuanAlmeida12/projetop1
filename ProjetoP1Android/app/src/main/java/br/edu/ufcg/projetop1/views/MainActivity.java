@@ -66,11 +66,14 @@ import java.util.UUID;
 import br.edu.ufcg.projetop1.R;
 import br.edu.ufcg.projetop1.adapters.UsersAdapter;
 import br.edu.ufcg.projetop1.core.QuickstartPreferences;
+import br.edu.ufcg.projetop1.core.UserAction;
+import br.edu.ufcg.projetop1.fragments.ActionList;
 import br.edu.ufcg.projetop1.fragments.BadgesFragment;
 import br.edu.ufcg.projetop1.fragments.MapFragment;
 import br.edu.ufcg.projetop1.fragments.SearchUser;
 import br.edu.ufcg.projetop1.fragments.UserProfile;
 import br.edu.ufcg.projetop1.services.RegistrationIntentService;
+import br.edu.ufcg.projetop1.utils.ActionUtils;
 import br.edu.ufcg.projetop1.utils.FollowUtil;
 
 public class MainActivity extends AppCompatActivity
@@ -286,7 +289,8 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_badges) {
             setFragment(BadgesFragment.newInstance());
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.nav_actions_user) {
+            setFragment(ActionList.newInstance());
 
         } else if (id == R.id.nav_send) {
 
@@ -358,7 +362,9 @@ public class MainActivity extends AppCompatActivity
                 DatabaseReference myRef = database.getReference("user-" +
                         "photo");
                 myRef.child(userid).child(photoId).setValue(ref);
-//                DatabaseReference refActivity = database.getReference("user-activity");
+                DatabaseReference refAction = database.getReference("action");
+                UserAction action = new UserAction(userid, ActionUtils.ACTION_NEW_PHOTO, ref);
+                refAction.push().setValue(action);
 //                refActivity.child(userid).child(photoId).setValue(ref);
                 Log.e(TAG, downloadUrl.toString());
             }
