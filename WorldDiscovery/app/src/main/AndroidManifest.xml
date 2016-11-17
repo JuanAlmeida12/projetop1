@@ -11,12 +11,12 @@
         android:required="true" />
 
     <application
-        android:name=".WDApplication"
+        android:name="android.support.multidex.MultiDexApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.NoActionBar">
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -71,7 +71,7 @@
             android:name=".activities.UserDetailDetailActivity"
             android:label="@string/title_userdetail_detail"
             android:parentActivityName=".activities.UserDetailListActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar">
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="p1.edu.ufcg.worlddiscovery.activities.UserDetailListActivity" />

@@ -35,6 +35,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="15dip"
+            android:textColor="#FFFFFF"
             android:text="@string/next_wellcome" />
 
         <Button
@@ -45,6 +46,7 @@
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="15dip"
             android:text="@string/back_wellcome"
+            android:textColor="#FFFFFF"
             android:visibility="gone" />
 
         <Button
@@ -56,6 +58,7 @@
             android:layout_marginRight="15dip"
             android:contentDescription="Let's start"
             android:text="@string/finish"
+            android:textColor="#FFFFFF"
             android:visibility="gone" />
 
     </RelativeLayout>
