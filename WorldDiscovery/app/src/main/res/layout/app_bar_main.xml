@@ -26,8 +26,8 @@
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/bs_main"
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:background="@android:color/darker_gray"
+        android:layout_height="200dp"
+        android:background="#FFFFFF"
         android:clipToPadding="true"
         app:layout_behavior="android.support.design.widget.BottomSheetBehavior">
 
@@ -41,7 +41,9 @@
                 android:layout_height="70dp"
                 android:gravity="center"
                 android:orientation="horizontal"
-                android:padding="5dp"
+                android:paddingBottom="5dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:weightSum="2.1">
 
                 <LinearLayout
@@ -52,8 +54,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_account_balance_wallet_black_24dp" />
@@ -67,12 +69,18 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
                             android:text="@string/score" />
 
                         <TextView
                             android:id="@+id/user_score"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+
                             android:text="0"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -90,8 +98,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_query_builder_black_24dp" />
@@ -105,12 +113,19 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
                             android:text="@string/last_login" />
 
                         <TextView
                             android:id="@+id/user_last_login"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/itemText"
+                            android:layout_marginLeft="10dp"
+
                             android:text="@string/never"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -136,8 +151,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_assignment_ind_black_24dp" />
@@ -151,11 +166,19 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+
                             android:text="@string/since" />
 
                         <TextView
                             android:id="@+id/user_since"
                             android:layout_width="wrap_content"
+                            android:textColor="@color/itemText"
+                            android:layout_marginLeft="10dp"
+
                             android:layout_height="wrap_content"
                             android:text="Today"/>
                     </LinearLayout>
@@ -174,8 +197,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_menu_camera" />
@@ -189,11 +212,19 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+
                             android:text="Posts" />
 
                         <TextView
                             android:id="@+id/user_posts"
                             android:layout_width="wrap_content"
+                            android:textColor="@color/itemText"
+                            android:layout_marginLeft="10dp"
+
                             android:layout_height="wrap_content"
                             android:text="0"/>
                     </LinearLayout>
@@ -220,8 +251,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_beenhere_black_24dp" />
@@ -235,12 +266,20 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+
                             android:text="@string/places" />
 
                         <TextView
                             android:id="@+id/user_places"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/itemText"
+                            android:layout_marginLeft="10dp"
+
                             android:text="0"/>
                     </LinearLayout>
                 </LinearLayout>
@@ -258,8 +297,8 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:layout_width="45dp"
-                        android:layout_height="45dp"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginLeft="5dp"
                         android:src="@drawable/ic_archive_black_24dp" />
@@ -273,11 +312,18 @@
                             style="@style/Base.TextAppearance.AppCompat.Title"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:textColor="@color/colorAccent"
+                            android:layout_marginLeft="10dp"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+
                             android:text="@string/badges" />
 
                         <TextView
                             android:id="@+id/user_badges"
                             android:layout_width="wrap_content"
+                            android:textColor="@color/itemText"
+                            android:layout_marginLeft="10dp"
                             android:layout_height="wrap_content"
                             android:text="0"/>
                     </LinearLayout>

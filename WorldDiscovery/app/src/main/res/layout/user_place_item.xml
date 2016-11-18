@@ -17,6 +17,7 @@
         style="@style/Base.TextAppearance.AppCompat.SearchResult.Title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/itemText"
         android:text="place" />
 
 </LinearLayout>
