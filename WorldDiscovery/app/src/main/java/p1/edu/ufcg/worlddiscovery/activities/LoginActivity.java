@@ -4,15 +4,22 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.PorterDuff;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -52,6 +59,9 @@ public class LoginActivity extends AppCompatActivity implements
     private ProgressBar loginProgress;
     private SignInButton signInButton;
     private CoordinatorLayout coordinatorLayout;
+    private EditText inputEmail, inputPassword;
+    private TextInputLayout inputLayoutEmail, inputLayoutPassword;
+    private Button btnSignUp, btnLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +72,16 @@ public class LoginActivity extends AppCompatActivity implements
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id
                 .coordinatorLayout);
         mAuth = FirebaseAuth.getInstance();
+
+        inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
+        inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
+        inputEmail = (EditText) findViewById(R.id.input_email);
+        inputPassword = (EditText) findViewById(R.id.input_password);
+        btnSignUp = (Button) findViewById(R.id.btn_signup);
+        btnLogin = (Button) findViewById(R.id.btn_login);
+
+        inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
+        inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.request_id_token))
@@ -94,6 +114,42 @@ public class LoginActivity extends AppCompatActivity implements
         signInButton.setOnClickListener(this);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
         signInButton.setScopes(gso.getScopeArray());
+    }
+
+    private boolean validateEmail() {
+        String email = inputEmail.getText().toString().trim();
+
+        if (email.isEmpty() || !isValidEmail(email)) {
+            inputLayoutEmail.setError("Email inválido");
+            requestFocus(inputEmail);
+            return false;
+        } else {
+            inputLayoutEmail.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private boolean validatePassword() {
+        if (inputPassword.getText().toString().trim().isEmpty()) {
+            inputLayoutPassword.setError("Senha inválida");
+            requestFocus(inputPassword);
+            return false;
+        } else {
+            inputLayoutPassword.setErrorEnabled(false);
+        }
+
+        return true;
+    }
+
+    private static boolean isValidEmail(String email) {
+        return !TextUtils.isEmpty(email) && android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private void requestFocus(View view) {
+        if (view.requestFocus()) {
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        }
     }
 
     @Override
@@ -219,5 +275,31 @@ public class LoginActivity extends AppCompatActivity implements
         boolean result = sharedPref.getBoolean(getString(R.string.first_use_key), false);
         sharedPref.edit().putBoolean(getString(R.string.first_use_key), true).commit();
         return result;
+    }
+
+    private class MyTextWatcher implements TextWatcher {
+
+        private View view;
+
+        private MyTextWatcher(View view) {
+            this.view = view;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        }
+
+        public void afterTextChanged(Editable editable) {
+            switch (view.getId()) {
+                case R.id.input_email:
+                    validateEmail();
+                    break;
+                case R.id.input_password:
+                    validatePassword();
+                    break;
+            }
+        }
     }
 }
