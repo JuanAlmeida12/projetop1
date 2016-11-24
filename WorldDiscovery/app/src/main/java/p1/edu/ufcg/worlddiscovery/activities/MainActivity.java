@@ -248,11 +248,7 @@ public class MainActivity extends AppCompatActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.7
-        switch (item.getItemId()) {
-            case R.id.action_take_photo:
-                dispatchTakePictureIntent();
-                return true;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -270,14 +266,28 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_my_profile) {
+        if(id == R.id.nav_home){
+            setFragment(MapFragment.newInstance());
+        } else if (id == R.id.nav_feed) {
+            //colocar tela
+        } else if (id == R.id.nav_badges) {
+            //colocar tela
+        } else if (id == R.id.nav_camera) {
+            dispatchTakePictureIntent();
+        } else if (id == R.id.nav_places) {
+            //colocar tela
+        } else if (id == R.id.nav_gallery) {
+            //colocar tela
+        } else if (id == R.id.nav_actions_user) {
+            setFragment(RecentActivities.newInstance());
+        } else if (id == R.id.nav_share) {
+            //dispatchTakePictureIntent();
+        }else if (id == R.id.nav_settings) {
             Intent i = new Intent(this, UserDetailDetailActivity.class);
             i.putExtra(UserDetailDetailFragment.ARG_USER_ID,UserUtils.getCurrentUser().getUid());
             startActivity(i);
-        } else if (id == R.id.nav_home) {
-            setFragment(MapFragment.newInstance());
-        } else if (id == R.id.nav_actions_user) {
-            setFragment(RecentActivities.newInstance());
+        } else if (id == R.id.nav_about) {
+            //setFragment(MapFragment.newInstance());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

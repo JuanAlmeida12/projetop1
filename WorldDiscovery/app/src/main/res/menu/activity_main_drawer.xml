@@ -2,18 +2,50 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_home_white_24dp"
-            android:title="Home" />
+            android:icon="@drawable/home_icon"
+            android:title="Início" />
         <item
-            android:id="@+id/nav_my_profile"
-            android:icon="@drawable/ic_portrait_white_24dp"
-            android:title="@string/my_profile" />
+            android:id="@+id/nav_feed"
+            android:icon="@drawable/feed_icon"
+            android:title="Feed" />
+        <item
+            android:id="@+id/nav_badges"
+            android:icon="@drawable/badges_icon"
+            android:title="Conquistas" />
+        <item
+            android:id="@+id/nav_camera"
+            android:icon="@drawable/camera_icon"
+            android:title="Câmera" />
+        <item
+            android:id="@+id/nav_places"
+            android:icon="@drawable/places_icon"
+            android:title="Lugares" />
+        <item
+            android:id="@+id/nav_gallery"
+            android:icon="@drawable/gallery_icon"
+            android:title="Galeria" />
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/share"
+            android:title="Compartilhar" />
         <item
             android:id="@+id/nav_actions_user"
-            android:icon="@drawable/ic_record_voice_over_white_24dp"
+            android:icon="@drawable/activities_icon"
             android:title="@string/recent_activity" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/settings_icon"
+            android:title="Configurações" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/about_icon"
+            android:title="Sobre" />
+        <!--E.g.: Icons made by Freepik from www.flaticon.com-->
+
+
         </group>
 
 </menu>
