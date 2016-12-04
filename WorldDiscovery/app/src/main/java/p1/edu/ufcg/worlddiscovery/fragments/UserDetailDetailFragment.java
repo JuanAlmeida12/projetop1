@@ -205,9 +205,6 @@ public class UserDetailDetailFragment extends Fragment {
 
     }
     private boolean isCurrentUser(String id) {
-        if(UserUtils.getCurrentUser().getUid().equals(id)){
-            return true;
-        }
         return false;
     }
 }

@@ -69,4 +69,9 @@
     <string name="my_profile">My Profile</string>
     <string name="recent_activity">Recent Activity</string>
     <string name="unfollow">Unfollow</string>
+    <string name="parse_server_url">http://192.168.1.107:1337/parse/</string>
+    <string name="parser_app_id">5cwnGD86uc6TgMhfcc3wPHuKDY8gW7EqTrLDb9aC</string>
+    <string name="facebook_app_id">544374412414985</string>
+    <string name="fb_login_protocol_scheme">fb544374412414985</string>
+    <string name="parser_client_key">Aw6buQlnzUS1FS5rgPIf1CGvWGAaEfarJhtMdWva</string>
 </resources>

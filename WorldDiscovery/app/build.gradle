@@ -39,6 +39,8 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0'
     compile 'com.github.clans:fab:1.6.4'
     compile 'com.flipboard:bottomsheet-core:1.5.2'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.flipboard:bottomsheet-commons:1.5.2'
+    compile 'com.android.support:multidex:1.0.0'
 }
 apply plugin: 'com.google.gms.google-services'

@@ -46,6 +46,9 @@ import com.google.android.gms.location.places.Places;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.net.URL;
 import java.util.Calendar;
@@ -108,7 +111,6 @@ public class MainActivity extends AppCompatActivity
         mSuportFrag = getSupportFragmentManager();
 
 
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
@@ -122,10 +124,13 @@ public class MainActivity extends AppCompatActivity
 
         final View header = navigationView.getHeaderView(0);
         TextView name = (TextView) header.findViewById(R.id.user_nav_name);
-        name.setText(UserUtils.formattedName(UserUtils.getCurrentUser().getDisplayName()));
+        name.setText(UserUtils.formattedName(ParseUser.getCurrentUser().getString("name")));
 
+        ParseFile imagefile = ParseUser.getCurrentUser().getParseFile("image");
         ImageView image = (ImageView) header.findViewById(R.id.image_user_nav);
-        getImage(UserUtils.getCurrentUser().getPhotoUrl().toString(),image);
+        getImage(imagefile != null ?
+                imagefile.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
+                , image);
 
         View bottomSheetMain = findViewById(R.id.bs_main);
         mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetMain);
@@ -163,30 +168,21 @@ public class MainActivity extends AppCompatActivity
 
 
     private void setUpUserInfo() {
-        UserUtils.getUser(UserUtils.getCurrentUser().getUid(), new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                TextView userScore = (TextView) findViewById(R.id.user_score);
-                TextView userLL = (TextView) findViewById(R.id.user_last_login);
-                TextView userSince = (TextView) findViewById(R.id.user_since);
-                TextView userBadges = (TextView) findViewById(R.id.user_badges);
-                TextView userPlaces = (TextView) findViewById(R.id.user_places);
-                TextView userPosts = (TextView) findViewById(R.id.user_posts);
 
-                userScore.setText(dataSnapshot.child("score").getValue().toString());
-                userLL.setText(getDate(dataSnapshot.child("lastLogin").getValue(Long.class)));
-                userPosts.setText(dataSnapshot.child("numPosts").getValue().toString());
-                userBadges.setText(dataSnapshot.child("numBadges").getValue().toString());
-                userPlaces.setText(dataSnapshot.child("numPlaces").getValue().toString());
-                userSince.setText(getDate(dataSnapshot.child("createdAt").getValue(Long.class)));
+        ParseUser user = ParseUser.getCurrentUser();
 
-            }
+        String score = user.getString("score") != null ? user.getString("score") : "0";
+        String since = user.getCreatedAt().toString();
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
+        TextView userScore = (TextView) findViewById(R.id.user_score);
+        TextView userLL = (TextView) findViewById(R.id.user_last_login);
+        TextView userSince = (TextView) findViewById(R.id.user_since);
+        TextView userBadges = (TextView) findViewById(R.id.user_badges);
+        TextView userPlaces = (TextView) findViewById(R.id.user_places);
+        TextView userPosts = (TextView) findViewById(R.id.user_posts);
+        userScore.setText(score);
+        userSince.setText(since);
     }
 
     @Override
@@ -266,7 +262,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if(id == R.id.nav_home){
+        if (id == R.id.nav_home) {
             setFragment(MapFragment.newInstance());
         } else if (id == R.id.nav_feed) {
             //colocar tela
@@ -282,10 +278,7 @@ public class MainActivity extends AppCompatActivity
             setFragment(RecentActivities.newInstance());
         } else if (id == R.id.nav_share) {
             //dispatchTakePictureIntent();
-        }else if (id == R.id.nav_settings) {
-            Intent i = new Intent(this, UserDetailDetailActivity.class);
-            i.putExtra(UserDetailDetailFragment.ARG_USER_ID,UserUtils.getCurrentUser().getUid());
-            startActivity(i);
+        } else if (id == R.id.nav_settings) {
         } else if (id == R.id.nav_about) {
             //setFragment(MapFragment.newInstance());
         }
@@ -356,7 +349,7 @@ public class MainActivity extends AppCompatActivity
         return false;
     }
 
-    public Location getmLastLocation(){
+    public Location getmLastLocation() {
         return mLastLocation;
     }
 

@@ -103,22 +103,6 @@ public class HandleGeofenceService extends Service implements GoogleApiClient.Co
                     final Iterator<DataSnapshot> iterator = dataSnapshot.getChildren().iterator();
                     while (iterator.hasNext()){
                         final DataSnapshot point = iterator.next();
-                        PointUtils.getUserPoints(UserUtils.getCurrentUser().getUid(), new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                if (!point.getKey().equals(dataSnapshot.child("codplace").getValue(String.class))){
-                                    //Log.e("gg", "Não tenho o pont");
-                                    GeofenceUtils.createGeofece(point.getKey(),point.getValue(Point.class),getApplicationContext(), mGoogleApiClient, getGeofencePendingIntent(), HandleGeofenceService.this);
-                                } else {
-                                    //Log.e("gg", "Tenho o pont");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                                stopSelf(msg.arg1);
-                            }
-                        });
                     }
                 }
 

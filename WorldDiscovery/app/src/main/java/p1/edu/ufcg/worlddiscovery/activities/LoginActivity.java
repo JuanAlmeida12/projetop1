@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.PorterDuff;
+import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -23,6 +24,10 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.facebook.FacebookBroadcastReceiver;
+import com.facebook.FacebookSdk;
+import com.facebook.Profile;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -32,6 +37,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
@@ -41,6 +47,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.parse.LogInCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
@@ -50,14 +62,7 @@ public class LoginActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
 
-    private static final int RC_SIGN_IN = 9001;
-    private static final String TAG = "SignInActivity";
-
-    private GoogleApiClient mGoogleApiClient;
-    private FirebaseAuth.AuthStateListener mAuthListener;
-    private FirebaseAuth mAuth;
     private ProgressBar loginProgress;
-    private SignInButton signInButton;
     private CoordinatorLayout coordinatorLayout;
     private EditText inputEmail, inputPassword;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
@@ -71,49 +76,29 @@ public class LoginActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_login);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id
                 .coordinatorLayout);
-        mAuth = FirebaseAuth.getInstance();
 
         inputLayoutEmail = (TextInputLayout) findViewById(R.id.input_layout_email);
         inputLayoutPassword = (TextInputLayout) findViewById(R.id.input_layout_password);
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
         btnSignUp = (Button) findViewById(R.id.btn_signup);
+
+        //Login Email and Password
         btnLogin = (Button) findViewById(R.id.btn_login);
+        btnLogin.setOnClickListener(this);
 
         inputEmail.addTextChangedListener(new MyTextWatcher(inputEmail));
         inputPassword.addTextChangedListener(new MyTextWatcher(inputPassword));
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.request_id_token))
-                .requestEmail()
-                .requestProfile()
-                .build();
-
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-                .build();
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
-
         loginProgress = (ProgressBar) findViewById(R.id.login_pb);
-        signInButton = (SignInButton) findViewById(R.id.sign_in_button);
-        signInButton.setOnClickListener(this);
-        signInButton.setSize(SignInButton.SIZE_STANDARD);
-        signInButton.setScopes(gso.getScopeArray());
+        LoginButton faceButton = (LoginButton) findViewById(R.id.login_button);
+        faceButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                signInFacebook();
+            }
+        });
+        isLogged();
     }
 
     private boolean validateEmail() {
@@ -152,71 +137,69 @@ public class LoginActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
+    private void isLogged() {
         showProgressDialog();
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
-        if (opr.isDone()) {
-           //hideProgressDialog();
-            // If the user's cached credentials are valid, the OptionalPendingResult will be "done"
-            // and the GoogleSignInResult will be available instantly.
-            Log.d(TAG, "Got cached sign-in");
-            GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
-        } else {
-            // If the user has not previously signed in on this device or the sign-in has expired,
-            // this asynchronous branch will attempt to sign in the user silently.  Cross-device
-            // single sign-on will occur in this branch.
-            opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
-                @Override
-                public void onResult(GoogleSignInResult googleSignInResult) {
-                    hideProgressDialog();
-                    handleSignInResult(googleSignInResult);
-                }
-            });
+        ParseUser current = ParseUser.getCurrentUser();
+        if (null != current) {
+            Intent intentMain = new Intent(LoginActivity.this, MainActivity.class);
+            startActivity(intentMain);
         }
+        hideProgressDialog();
     }
 
     private void showProgressDialog() {
         loginProgress.setVisibility(View.VISIBLE);
-        signInButton.setVisibility(View.GONE);
     }
 
     private void hideProgressDialog() {
         loginProgress.setVisibility(View.GONE);
-        signInButton.setVisibility(View.VISIBLE);
     }
 
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
-            GoogleSignInAccount acct = result.getSignInAccount();
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            //updateUI(true);
-            firebaseAuthWithGoogle(acct);
-            Log.e(TAG, "logadp:" + acct.getDisplayName());
-        } else {
-            hideProgressDialog();
-            Log.e(TAG, result.getStatus().toString());
-            // Signed out, show unauthenticated UI.
-            //updateUI(false);
-        }
+    private void signInFacebook() {
+        ParseFacebookUtils.logInWithReadPermissionsInBackground(this, null, new LogInCallback() {
+                    @Override
+                    public void done(ParseUser user, ParseException err) {
+                        if (user == null) {
+                            Log.d("MyApp", "Uh oh. The user cancelled the Facebook login.");
+                        } else {
+                            Profile faceUser = Profile.getCurrentProfile();
+                            user.put("name", faceUser.getName());
+                            user.saveInBackground(new SaveCallback() {
+                                                      @Override
+                                                      public void done(ParseException e) {
+                                                          if (e == null) {
+                                                              isLogged();
+                                                          } else {
+                                                              Log.e("dasd",e.getMessage());
+                                                          }
+                                                      }
+                                                  }
+
+                            );
+                        }
+                    }
+                }
+
+        );
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
-    }
 
     private void signIn() {
+        String email = inputEmail.getText().toString();
+        String password = inputPassword.getText().toString();
         showProgressDialog();
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        ParseUser.logInInBackground(email, password, new LogInCallback() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
+                hideProgressDialog();
+                if (e == null) {
+                    isLogged();
+                } else {
+                    Log.e("fzd", e.getMessage());
+                    Snackbar.make(coordinatorLayout, "Something is wrong with login.", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
@@ -229,52 +212,11 @@ public class LoginActivity extends AppCompatActivity implements
         signIn();
     }
 
-    private void firebaseAuthWithGoogle(GoogleSignInAccount acct) {
-        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
-        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
-        mAuth.signInWithCredential(credential)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
-                        if (!task.isSuccessful()) {
-                            Log.w(TAG, "signInWithCredential", task.getException());
-                            Snackbar
-                                    .make(coordinatorLayout, R.string.failed_signin, Snackbar.LENGTH_LONG).show();
-
-                        } else {
-                            UserUtils.loginUpdate();
-                            Intent i = null;
-                            if(isFirstTime()){
-                                i= new Intent(LoginActivity.this, MainActivity.class);
-                            } else {
-                                i= new Intent(LoginActivity.this, WellcomeActivity.class);
-                            }
-                            startActivity(i);
-                            finish();
-                        }
-                    }
-                });
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-    }
-
-    public boolean isFirstTime() {
-
-        SharedPreferences sharedPref = getSharedPreferences(
-                getString(R.string.preference_first_use), Context.MODE_PRIVATE);
-        boolean result = sharedPref.getBoolean(getString(R.string.first_use_key), false);
-        sharedPref.edit().putBoolean(getString(R.string.first_use_key), true).commit();
-        return result;
+        ParseFacebookUtils.onActivityResult(requestCode, resultCode, data);
     }
 
     private class MyTextWatcher implements TextWatcher {
