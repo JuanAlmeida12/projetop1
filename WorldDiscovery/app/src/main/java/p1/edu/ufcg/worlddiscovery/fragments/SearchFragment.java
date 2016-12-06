@@ -73,6 +73,7 @@ public class SearchFragment extends Fragment implements Searchable {
     @Override
     public void getQuery(String query) {
         if (null != adapter) {
+            adapter.clear();
             SearchUtils.search(query,adapter);
         }
     }

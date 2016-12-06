@@ -3,8 +3,10 @@ package p1.edu.ufcg.worlddiscovery.utils;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.HashMap;
@@ -20,7 +22,10 @@ public class UserUtils {
 
     }
 
-    public static void getUser(String uid, ValueEventListener listener) {
+    public static void getUser(String uid, FindCallback<ParseUser> callback) {
+        ParseQuery<ParseUser> query = new ParseQuery<ParseUser>(ParseUser.class);
+        query.whereEqualTo("username", uid);
+        query.findInBackground(callback);
     }
 
     public static void search(String name, ChildEventListener litenner) {

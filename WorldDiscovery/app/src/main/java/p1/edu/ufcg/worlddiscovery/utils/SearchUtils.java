@@ -6,8 +6,16 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.FindCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import p1.edu.ufcg.worlddiscovery.adapters.SearchAdapter;
 import p1.edu.ufcg.worlddiscovery.core.Point;
@@ -18,61 +26,20 @@ import p1.edu.ufcg.worlddiscovery.core.Point;
 public class SearchUtils {
 
     public static void search(String query, final SearchAdapter adapter) {
-        adapter.clear();
-        UserUtils.search(query, new ChildEventListener() {
-
+        ParseQuery<ParseUser> query1 = new ParseQuery(ParseUser.class);
+        query1.whereContains("name", query);
+        query1.findInBackground(new FindCallback<ParseUser>() {
             @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("gg", dataSnapshot.getKey());
-                adapter.addUser(dataSnapshot);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        PointUtils.searchPoint(query, new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Log.d("gg", dataSnapshot.getKey());
-                adapter.addPoint(dataSnapshot);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void done(List<ParseUser> list, ParseException e) {
+                if (e == null) {
+                    Log.e("dasd", list.size()+"");
+                    for (ParseUser user : list) {
+                        Log.e("dasd", user.getUsername());
+                        adapter.addUser(user);
+                    }
+                } else {
+                    e.printStackTrace();
+                }
             }
         });
     }

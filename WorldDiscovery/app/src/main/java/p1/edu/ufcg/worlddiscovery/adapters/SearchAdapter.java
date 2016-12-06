@@ -16,6 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.firebase.database.DataSnapshot;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -35,7 +37,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
     public static final String POINT_TYPE = "Point";
     public static final String USER_TYPE = "User";
 
-    private List<DataSnapshot> data;
+    private List<ParseUser> data;
     private List<String> types;
     private Context ctx;
 
@@ -55,23 +57,23 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
 
     @Override
     public void onBindViewHolder(final SearchHolder holder, int position) {
-        final DataSnapshot data = this.data.get(position);
+        final ParseUser data = this.data.get(position);
         if (types.get(position).equals(USER_TYPE)) {
-            getImage(data.child("photoURL").getValue(String.class), holder.image);
-            holder.name.setText(UserUtils.formattedName(data.child("name").getValue(String.class)));
+            ParseFile image = data.getParseFile("image");
+            getImage(image != null? image.getUrl():"http://s3.amazonaws.com/37assets/svn/765-default-avatar.png", holder.image);
+            holder.name.setText(UserUtils.formattedName(data.getString("name")));
             holder.type.setText(R.string.user_type);
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String transitionName = ctx.getString(R.string.user_image_search);
                     Intent i = new Intent(ctx, UserDetailDetailActivity.class);
-                    i.putExtra(UserDetailDetailFragment.ARG_USER_ID, data.getKey());
-                    ctx.startActivity(i, ActivityOptions.makeSceneTransitionAnimation((Activity) ctx, holder.image , transitionName).toBundle());
+                    i.putExtra(UserDetailDetailFragment.ARG_USER_ID, data.getUsername());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        ctx.startActivity(i, ActivityOptions.makeSceneTransitionAnimation((Activity) ctx, holder.image , transitionName).toBundle());
+                    }
                 }
             });
-        } else {
-            holder.name.setText((data.child("placeName").getValue(String.class)));
-            holder.type.setText(R.string.place_type);
         }
     }
 
@@ -107,7 +109,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
     }
 
 
-    public void addUser(DataSnapshot user) {
+    public void addUser(ParseUser user) {
         if (!isOnList(user)) {
             data.add(user);
             types.add(USER_TYPE);
@@ -115,7 +117,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
         }
     }
 
-    public void addPoint(DataSnapshot point) {
+    public void addPoint(ParseUser point) {
         if (!isOnList(point)) {
             data.add(point);
             types.add(POINT_TYPE);
@@ -123,9 +125,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchHolder> {
         }
     }
 
-    private boolean isOnList(DataSnapshot data) {
-        for (DataSnapshot mData : this.data) {
-            if (data.getKey().equals(mData.getKey())) {
+    private boolean isOnList(ParseUser data) {
+        for (ParseUser mData : this.data) {
+            if (data.getUsername().equals(mData.getUsername())) {
                 return true;
             }
         }

@@ -4,49 +4,48 @@ import android.Manifest;
 import android.app.SearchManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.widget.SearchView;
-import android.text.format.DateFormat;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.PlaceLikelihood;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -55,16 +54,13 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
-import p1.edu.ufcg.worlddiscovery.core.User;
 import p1.edu.ufcg.worlddiscovery.dialogs.PhotoEditDialog;
 import p1.edu.ufcg.worlddiscovery.fragments.MapFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.RecentActivities;
 import p1.edu.ufcg.worlddiscovery.fragments.SearchFragment;
-import p1.edu.ufcg.worlddiscovery.fragments.UserDetailDetailFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
-import p1.edu.ufcg.worlddiscovery.utils.PhotoUtil;
 import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
 
 public class MainActivity extends AppCompatActivity
@@ -129,7 +125,7 @@ public class MainActivity extends AppCompatActivity
         ParseFile imagefile = ParseUser.getCurrentUser().getParseFile("image");
         ImageView image = (ImageView) header.findViewById(R.id.image_user_nav);
         getImage(imagefile != null ?
-                imagefile.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
+                        imagefile.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
                 , image);
 
         View bottomSheetMain = findViewById(R.id.bs_main);
@@ -137,8 +133,34 @@ public class MainActivity extends AppCompatActivity
         mBottomSheetBehavior.setPeekHeight(260);
         mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         setUpUserInfo();
-        setFragment(MapFragment.newInstance());
         toolbar.setTitle(getString(R.string.app_name));
+    }
+
+    private void getActualPlace() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Log.e("dsajdjsa","na func");
+        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
+                .getCurrentPlace(mGoogleApiClient, null);
+        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+            @Override
+            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
+                    Log.i("dasdasfaga", String.format("Place '%s' has likelihood: %g",
+                            placeLikelihood.getPlace().getName(),
+                            placeLikelihood.getLikelihood()));
+                }
+                likelyPlaces.release();
+            }
+        });
     }
 
     private void getImage(final String imageUrl, final ImageView image) {
@@ -263,7 +285,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            setFragment(MapFragment.newInstance());
+            setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else if (id == R.id.nav_feed) {
             //colocar tela
         } else if (id == R.id.nav_badges) {
@@ -327,6 +349,20 @@ public class MainActivity extends AppCompatActivity
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
+        if(mLastLocation != null){
+            setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            getActualPlace();
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Ativar GPS")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // FIRE ZE MISSILES!
+                        }
+                    });
+            builder.create().show();
+        }
+
 
     }
 

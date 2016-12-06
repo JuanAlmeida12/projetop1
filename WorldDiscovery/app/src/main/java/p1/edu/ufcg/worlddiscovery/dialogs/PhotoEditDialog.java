@@ -119,7 +119,7 @@ public class PhotoEditDialog extends DialogFragment {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                PhotoUtil.sendPhoto(mImage, ((MainActivity) getActivity()).getmLastLocation(), message.getText().toString());
+                PhotoUtil.sendPhoto(mImage, ((MainActivity) getActivity()).getmLastLocation(), message.getText().toString(), getContext());
                 dismiss();
             }
         });

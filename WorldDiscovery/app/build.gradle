@@ -1,18 +1,24 @@
 apply plugin: 'com.android.application'
 
 android {
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "p1.edu.ufcg.worlddiscovery"
         minSdkVersion 19
+        multiDexEnabled true
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
     buildTypes {
         release {
+            multiDexEnabled true
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -42,5 +48,6 @@ dependencies {
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.flipboard:bottomsheet-commons:1.5.2'
     compile 'com.android.support:multidex:1.0.0'
+
 }
 apply plugin: 'com.google.gms.google-services'

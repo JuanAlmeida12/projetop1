@@ -73,20 +73,20 @@ public class RecentActivities extends Fragment {
                 while (i.hasNext()) {
                     final DataSnapshot activity = i.next();
                     if (FollowUtils.following(activity.child("owner").getValue(String.class))) {
-                        UserUtils.getUser(activity.child("owner").getValue(String.class), new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot user) {
-                                if (user.exists()) {
-                                    Log.d("ffg", user.child("photoURL").getValue(String.class));
-                                    adapter.add(activity, user);
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-
-                            }
-                        });
+//                        UserUtils.getUser(activity.child("owner").getValue(String.class), new ValueEventListener() {
+//                            @Override
+//                            public void onDataChange(DataSnapshot user) {
+//                                if (user.exists()) {
+//                                    Log.d("ffg", user.child("photoURL").getValue(String.class));
+//                                    adapter.add(activity, user);
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancelled(DatabaseError databaseError) {
+//
+//                            }
+//                        });
                     }
                 }
             }

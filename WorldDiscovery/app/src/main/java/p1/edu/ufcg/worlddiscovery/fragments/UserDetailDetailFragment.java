@@ -19,8 +19,13 @@ import com.google.android.gms.ads.formats.NativeAd;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
 
 import java.net.URL;
+import java.util.List;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.activities.UserDetailDetailActivity;
@@ -131,36 +136,35 @@ public class UserDetailDetailFragment extends Fragment {
             follow.setVisibility(View.VISIBLE);
         }
 
-        UserUtils.getUser(userId, new ValueEventListener() {
+        UserUtils.getUser(userId, new FindCallback<ParseUser>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Activity activity = UserDetailDetailFragment.this.getActivity();
-                CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                ImageView image = (ImageView) appBarLayout.findViewById(R.id.user_image_detail);
-                if (appBarLayout != null) {
-                    appBarLayout.setTitle(UserUtils.formattedName(dataSnapshot.child("name").getValue(String.class)));
-                    getImage(dataSnapshot.child("photoURL").getValue(String.class), image);
-                    about.putBoolean(IS_CURRENT_USER_KEY,isCurrentUser(userId));
-                    about.putString(JOB_KEY, dataSnapshot.hasChild("job") ? dataSnapshot.child("job").getValue(String.class) : activity.getString(R.string.not_specified));
-                    about.putString(ADDRESS_KEY, dataSnapshot.hasChild("city") ? dataSnapshot.child("city").getValue(String.class) : activity.getString(R.string.not_specified));
-                    about.putString(GENDER_KEY, dataSnapshot.hasChild("gender") ? dataSnapshot.child("gender").getValue(String.class) : activity.getString(R.string.not_specified));
-                    about.putString(MESSAGE_KEY, dataSnapshot.hasChild("message") ? dataSnapshot.child("message").getValue(String.class) : activity.getString(R.string.not_specified));
-                    setFragment(AboutFragment.newInstance(about));
+            public void done(List<ParseUser> list, ParseException e) {
+                if (e == null && !list.isEmpty()) {
+                    ParseUser user = list.get(0);
+                    Activity activity = UserDetailDetailFragment.this.getActivity();
+                    CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+                    ImageView image = (ImageView) appBarLayout.findViewById(R.id.user_image_detail);
+                    if (appBarLayout != null) {
+                        ParseFile imageParse = user.getParseFile("image");
+                        appBarLayout.setTitle(UserUtils.formattedName(user.getString("name")));
+                        getImage(imageParse != null ? imageParse.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png", image);
+                        about.putBoolean(IS_CURRENT_USER_KEY, isCurrentUser(userId));
+                        about.putString(JOB_KEY, user.getString("job") != null ? user.getString("job") : activity.getString(R.string.not_specified));
+                        about.putString(ADDRESS_KEY, user.getString("city") != null? user.getString("city") : activity.getString(R.string.not_specified));
+                        about.putString(GENDER_KEY, user.getString("gender") != null ? user.getString("gender") : activity.getString(R.string.not_specified));
+                        about.putString(MESSAGE_KEY, user.getString("message") != null ? user.getString("message") : activity.getString(R.string.not_specified));
+                        setFragment(AboutFragment.newInstance(about));
+                    }
                 }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
             }
         });
+
 
         return rootView;
     }
 
     private void stateFollowFb(FloatingActionButton follow) {
-        if(FollowUtils.following(userId)){
+        if (FollowUtils.following(userId)) {
             follow.setLabelText(getString(R.string.unfollow));
         } else {
             follow.setLabelText(getString(R.string.follow));
@@ -204,6 +208,7 @@ public class UserDetailDetailFragment extends Fragment {
 
 
     }
+
     private boolean isCurrentUser(String id) {
         return false;
     }

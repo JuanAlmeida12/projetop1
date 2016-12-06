@@ -71,30 +71,30 @@ public class UserActivities extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user_activities, container, false);
         final ActivityAdapter adapter = new ActivityAdapter(getContext());
-        UserUtils.getUser(userId, new ValueEventListener() {
-            @Override
-            public void onDataChange(final DataSnapshot user) {
-                ActivitiesUtils.getUserActivity(userId, new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        Iterator<DataSnapshot> i = dataSnapshot.getChildren().iterator();
-                        while (i.hasNext()) {
-                            adapter.add(i.next(),user);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+//        UserUtils.getUser(userId, new ValueEventListener() {
+//            @Override
+//            public void onDataChange(final DataSnapshot user) {
+//                ActivitiesUtils.getUserActivity(userId, new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                        Iterator<DataSnapshot> i = dataSnapshot.getChildren().iterator();
+//                        while (i.hasNext()) {
+//                            adapter.add(i.next(),user);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(DatabaseError databaseError) {
+//
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_activity);

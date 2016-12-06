@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -29,14 +31,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Iterator;
+import java.util.zip.Inflater;
 
 import p1.edu.ufcg.worlddiscovery.R;
+import p1.edu.ufcg.worlddiscovery.tasks.GooglePlacesReadTask;
 import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 
 /**
@@ -46,13 +51,17 @@ import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
  * Use the {@link MapFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback {
+
+
+    public static final String LNG = "lng";
+    public static final String LAT = "lat";
 
 
     private GoogleMap mMap;
-    private GoogleApiClient mGoogleApiClient;
     private View mView;
-    private Location mLastLocation;
+    private double myLatitude;
+    private double myLongitude;
 
     public MapFragment() {
         // Required empty public constructor
@@ -65,9 +74,11 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
      * @return A new instance of fragment MapFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance() {
+    public static MapFragment newInstance(double latitude, double longitude) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
+        args.putDouble(LAT, latitude);
+        args.putDouble(LNG, longitude);
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,6 +86,9 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        myLatitude = getArguments().getDouble(LAT);
+        myLongitude = getArguments().getDouble(LNG);
     }
 
     @Override
@@ -83,51 +97,12 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         // Create an instance of GoogleAPIClient.
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(getContext())
-                    .addConnectionCallbacks(this)
-                    .addApi(Places.GEO_DATA_API)
-                    .addApi(Places.PLACE_DETECTION_API)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
-        }
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         return mView;
-    }
-
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
-        if (mLastLocation != null) {
-            LatLng mposition = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mposition, 15));
-        }
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
     }
 
     @Override
@@ -145,23 +120,59 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
             return;
         }
         mMap.setMyLocationEnabled(true);
+        LatLng location = new LatLng(myLatitude, myLongitude);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
+        getNearbyPlaces(myLatitude, myLongitude);
         // Add a marker in Sydney and move the camera
         mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        PointUtils.getAllPoints(new ValueEventListener() {
+
+
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            // Use default InfoWindow frame
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> i = dataSnapshot.getChildren().iterator();
-                while (i.hasNext()){
-                    createMarker(i.next());
-                }
+            public View getInfoWindow(Marker arg0) {
+                return null;
             }
 
+            // Defines the contents of the InfoWindow
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public View getInfoContents(Marker arg0) {
+
+                // Getting view from the layout file infowindowlayout.xml
+                View v = LayoutInflater.from(getContext()).inflate(R.layout.infowindow, null);
+
+                LatLng latLng = arg0.getPosition();
+
+                TextView tv1 = (TextView) v.findViewById(R.id.textView1);
+                TextView tv2 = (TextView) v.findViewById(R.id.textView2);
+                String title = arg0.getTitle();
+                String informations = arg0.getSnippet();
+
+                tv1.setText(title);
+                tv2.setText(informations);
+
+                return v;
 
             }
         });
 
+    }
+
+    private void getNearbyPlaces(double latitude, double longitude) {
+        int PROXIMITY_RADIUS = 2000;
+        StringBuilder googlePlacesUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+        googlePlacesUrl.append("location=" + latitude + "," + longitude);
+        googlePlacesUrl.append("&radius=" + PROXIMITY_RADIUS);
+        googlePlacesUrl.append("&types=" + "natural_feature|park|art_gallery|museum");
+        googlePlacesUrl.append("&sensor=true");
+        googlePlacesUrl.append("&key=" + getString(R.string.google_maps_key));
+
+        GooglePlacesReadTask googlePlacesReadTask = new GooglePlacesReadTask();
+        Object[] toPass = new Object[2];
+        toPass[0] = mMap;
+        toPass[1] = googlePlacesUrl.toString();
+        googlePlacesReadTask.execute(toPass);
     }
 
     private void createMarker(final DataSnapshot data) {
