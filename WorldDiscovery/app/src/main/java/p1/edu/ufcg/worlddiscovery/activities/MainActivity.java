@@ -66,6 +66,7 @@ import p1.edu.ufcg.worlddiscovery.fragments.PlacesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.RecentActivities;
 import p1.edu.ufcg.worlddiscovery.fragments.SearchFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.SobreFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.UserDetailDetailFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Bundle about;
+    ParseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,7 +204,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setUpUserInfo() {
 
-        ParseUser user = ParseUser.getCurrentUser();
+        user = ParseUser.getCurrentUser();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);

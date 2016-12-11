@@ -1,13 +1,10 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="p1.edu.ufcg.worlddiscovery.fragments.SobreFragment">
+    android:background="@color/whitebg"
+    android:layout_height="match_parent">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/user_places_recycle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Lugares" />
-
-</FrameLayout>
+        android:layout_height="wrap_content" />
+</LinearLayout>
