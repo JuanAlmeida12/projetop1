@@ -66,8 +66,6 @@ import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, SearchView.OnQueryTextListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private BottomSheetBehavior<View> mBottomSheetBehavior;
-
     private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private Searchable searchable;
@@ -128,10 +126,6 @@ public class MainActivity extends AppCompatActivity
                         imagefile.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png"
                 , image);
 
-        View bottomSheetMain = findViewById(R.id.bs_main);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheetMain);
-        mBottomSheetBehavior.setPeekHeight(260);
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         setUpUserInfo();
         toolbar.setTitle(getString(R.string.app_name));
     }
@@ -193,16 +187,15 @@ public class MainActivity extends AppCompatActivity
 
         ParseUser user = ParseUser.getCurrentUser();
 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        final View header = navigationView.getHeaderView(0);
+
         String score = user.getString("score") != null ? user.getString("score") : "0";
         String since = user.getCreatedAt().toString();
 
-
-        TextView userScore = (TextView) findViewById(R.id.user_score);
-        TextView userLL = (TextView) findViewById(R.id.user_last_login);
-        TextView userSince = (TextView) findViewById(R.id.user_since);
-        TextView userBadges = (TextView) findViewById(R.id.user_badges);
-        TextView userPlaces = (TextView) findViewById(R.id.user_places);
-        TextView userPosts = (TextView) findViewById(R.id.user_posts);
+        TextView userScore = (TextView) header.findViewById(R.id.user_nav_score);
+        TextView userSince = (TextView) header.findViewById(R.id.user_nav_since);
         userScore.setText(score);
         userSince.setText(since);
     }

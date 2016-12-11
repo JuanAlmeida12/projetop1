@@ -77,7 +77,7 @@
                 android:layout_marginTop="40dp"
                 android:layout_weight="1"
                 android:background="@color/colorPrimary"
-                android:text="Login"
+                android:text="Cadastrar"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>

@@ -9,7 +9,7 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingTop="36dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -24,7 +24,102 @@
         android:layout_width="match_parent"
         android:id="@+id/user_nav_name"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
         android:text="Android Studio"
+        android:textSize="16sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/user_score_title"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:textSize="10sp"
+            android:textColor="@color/colorAccent"
+
+            android:textStyle="normal"
+            android:text="Score:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/user_nav_score"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:textSize="10sp"
+            android:textColor="@color/colorAccent"
+
+            android:textStyle="normal"
+            android:text="0"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/last_login_title"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            android:textColor="@color/colorAccent"
+
+            android:text="Last Login:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/user_nav_last_login"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            android:textColor="@color/colorAccent"
+            android:text="12/12/12 12:12"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/since_title"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            android:textColor="@color/colorAccent"
+
+            android:text="Since:"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+
+        <TextView
+            android:gravity="center_vertical|left"
+            android:layout_width="wrap_content"
+            android:id="@+id/user_nav_since"
+            android:layout_marginLeft="10dp"
+            android:layout_height="wrap_content"
+            android:textSize="10sp"
+            android:textStyle="normal"
+            android:textColor="@color/colorAccent"
+            android:text="12/12/12 12:12"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        </LinearLayout>
 </LinearLayout>

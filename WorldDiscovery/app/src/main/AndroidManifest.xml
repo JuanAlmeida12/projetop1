@@ -75,12 +75,13 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activities.UserDetailDetailActivity"
             android:label="@string/title_userdetail_detail"
@@ -90,6 +91,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="p1.edu.ufcg.worlddiscovery.activities.UserDetailListActivity" />
         </activity>
+        <activity android:name=".activities.SignUpActivity"></activity>
     </application>
 
 </manifest>
