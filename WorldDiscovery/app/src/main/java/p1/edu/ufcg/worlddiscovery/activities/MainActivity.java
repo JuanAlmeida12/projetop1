@@ -57,9 +57,15 @@ import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.dialogs.PhotoEditDialog;
+import p1.edu.ufcg.worlddiscovery.fragments.AboutFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.FeedFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.GalleryFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.MapFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.PlacesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.RecentActivities;
 import p1.edu.ufcg.worlddiscovery.fragments.SearchFragment;
+import p1.edu.ufcg.worlddiscovery.fragments.SobreFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
@@ -74,6 +80,7 @@ public class MainActivity extends AppCompatActivity
     private FragmentManager mSuportFrag;
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
+    private Bundle about;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -290,22 +297,22 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else if (id == R.id.nav_feed) {
-            //colocar tela
+            setFragment(new FeedFragment());
         } else if (id == R.id.nav_badges) {
-            //colocar tela
+            setFragment(new BadgesFragment());
         } else if (id == R.id.nav_camera) {
             dispatchTakePictureIntent();
         } else if (id == R.id.nav_places) {
-            //colocar tela
+            setFragment(new PlacesFragment());
         } else if (id == R.id.nav_gallery) {
-            //colocar tela
+            setFragment(new GalleryFragment());
         } else if (id == R.id.nav_actions_user) {
             setFragment(RecentActivities.newInstance());
         } else if (id == R.id.nav_share) {
             //dispatchTakePictureIntent();
         } else if (id == R.id.nav_settings) {
         } else if (id == R.id.nav_about) {
-            //setFragment(MapFragment.newInstance());
+            setFragment(new SobreFragment());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

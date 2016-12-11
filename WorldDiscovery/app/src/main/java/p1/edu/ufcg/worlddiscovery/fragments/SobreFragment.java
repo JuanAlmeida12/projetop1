@@ -10,13 +10,15 @@ import android.view.ViewGroup;
 
 import p1.edu.ufcg.worlddiscovery.R;
 
-public class BadgesFragment extends Fragment {
+
+public class SobreFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_badges, container, false);
-    }
+        final View mView = inflater.inflate(R.layout.fragment_sobre, container, false);
 
+        return mView;
+    }
 }

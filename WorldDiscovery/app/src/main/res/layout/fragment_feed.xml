@@ -2,12 +2,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment">
+    tools:context="p1.edu.ufcg.worlddiscovery.fragments.SobreFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Conquistas" />
+        android:text="Feed" />
 
 </FrameLayout>
