@@ -45,7 +45,7 @@ public class GalleryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View mView = inflater.inflate(R.layout.fragment_photos, container, false);
+        View mView = inflater.inflate(R.layout.fragment_gallery, container, false);
         Gallery gallery = (Gallery) mView.findViewById(R.id.gallery);
         selectedImage = (ImageView) mView.findViewById(R.id.imageView);
         gallery.setSpacing(1);

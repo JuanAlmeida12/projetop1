@@ -124,7 +124,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
         getNearbyPlaces(myLatitude, myLongitude);
         // Add a marker in Sydney and move the camera
-        mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+        mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 
 
         mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
