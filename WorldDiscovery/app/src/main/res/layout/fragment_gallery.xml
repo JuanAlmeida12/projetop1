@@ -13,34 +13,37 @@
         <Gallery
             android:id="@+id/gallery"
             android:layout_width="match_parent"
-            android:layout_height="100dp" />
+            android:layout_height="200dp" />
 
         <RelativeLayout
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <ImageView
                 android:id="@+id/imageView"
-                android:layout_width="250dp"
-                android:layout_height="250dp"
-                android:layout_centerInParent="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="100dp"
-                android:src="@drawable/icon" />
-            <LinearLayout
-                android:gravity="center"
-                android:background="#66000000"
-                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
-                <TextView
-                    style="@style/Base.TextAppearance.AppCompat.Title"
-                    android:id="@+id/photo_description"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:padding="30dp"
+                android:background="@color/whitebg"/>
+
+            <TextView
+            android:id="@+id/text_tip"
+            android:background="@color/whitebg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal|center_vertical"
+            android:text="Select a picture to see it zoomed here."/>
+
+            <TextView
+                android:id="@+id/photo_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/imageView"
+                android:layout_marginTop="-20dp"
+                android:gravity="center_horizontal|center_vertical"
+                android:text="Description"/>
         </RelativeLayout>
 
     </LinearLayout>

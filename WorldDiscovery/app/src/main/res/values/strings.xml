@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">WorldDiscovery</string>
     <string name="request_id_token">854911701416-2jql1uotrrnn9tpd1fn3brdcfmk7uqtt.apps.googleusercontent.com</string>
-    <string name="welcome">Wellcome</string>
+    <string name="welcome">Welcome</string>
     <string name="failed_signin">Failed SignIn</string>
     <string name="title_activity_main">MainActivity</string>
 

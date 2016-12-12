@@ -32,7 +32,7 @@ public class GalleryFragment extends Fragment {
     private String userId;
     private ImageView selectedImage;
     private GalleryImageAdapter galleryImageAdapter;
-    private TextView photodescription;
+    private TextView textTip, photoDescription;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,7 +50,9 @@ public class GalleryFragment extends Fragment {
         selectedImage = (ImageView) mView.findViewById(R.id.imageView);
         gallery.setSpacing(1);
         galleryImageAdapter = new GalleryImageAdapter(getContext());
-        photodescription = (TextView) mView.findViewById(R.id.photo_description);
+        textTip = (TextView) mView.findViewById(R.id.text_tip);
+        photoDescription = (TextView) mView.findViewById(R.id.photo_description);
+        photoDescription.setVisibility(View.INVISIBLE);
         gallery.setAdapter(galleryImageAdapter);
         gallery.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -58,7 +60,9 @@ public class GalleryFragment extends Fragment {
                 String desc = ((ParseObject) (ParseUser.getCurrentUser().getList("photos").get(position))).getString("description");
                 Log.d("ff", desc != null ? desc : "null");
                 selectedImage.setImageBitmap(galleryImageAdapter.getImage(position));
-                photodescription.setText(desc);
+                photoDescription.setText(desc);
+                photoDescription.setVisibility(View.VISIBLE);
+                textTip.setVisibility(View.INVISIBLE);
             }
         });
 
