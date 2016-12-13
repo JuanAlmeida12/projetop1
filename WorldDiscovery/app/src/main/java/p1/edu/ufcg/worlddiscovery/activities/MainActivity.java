@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,6 +24,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -232,7 +235,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+           // super.onBackPressed();
+            finish();
         }
     }
 
@@ -289,12 +293,20 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.action_checkin:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Fazer Checkin em "+ currentPlace.getPlace().getName())
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                PointUtils.visitedPoint(currentPlace.getPlace().getId());
-                            }
-                        });
+                if (currentPlace != null) {
+                    builder.setMessage("Fazer Checkin em " + currentPlace.getPlace().getName())
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    PointUtils.visitedPoint(currentPlace.getPlace().getId(), currentPlace.getPlace().getName().toString());
+                                }
+                            });
+                } else {
+                    builder.setMessage("Nenhum lugar proximo para fazer checkin! :(")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                }
                 builder.create().show();
                 break;
         }
@@ -368,6 +380,29 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    private Location getLocation() {
+        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            return null;
+        }
+
+        // Location wasn't found, check the next most accurate place for the current location
+        if (myLocation == null) {
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_COARSE);
+            // Finds a provider that matches the criteria
+            String provider = locationManager.getBestProvider(criteria, true);
+            // Use the provider to get the last known location
+            myLocation = locationManager.getLastKnownLocation(provider);
+        }
+
+        return myLocation;
+    }
+
+
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -380,8 +415,9 @@ public class MainActivity extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-                mGoogleApiClient);
+//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
+//                mGoogleApiClient);
+        mLastLocation = getLocation();
         if (mLastLocation != null) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
             getActualPlace();

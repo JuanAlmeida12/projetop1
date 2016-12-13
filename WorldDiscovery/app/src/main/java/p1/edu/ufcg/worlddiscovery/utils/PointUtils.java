@@ -28,8 +28,8 @@ public class PointUtils {
     public static void getPoint(String pid, ValueEventListener listener) {
     }
 
-    public static void visitedPoint(String id) {
-        ActivitiesUtils.newPlace(id);
+    public static void visitedPoint(String id, String name) {
+        ActivitiesUtils.newPlace(id,name);
     }
 
     public static void searchPoint(String query, ChildEventListener listener) {

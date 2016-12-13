@@ -1,5 +1,6 @@
 package p1.edu.ufcg.worlddiscovery.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -66,6 +67,7 @@ public class LoginActivity extends AppCompatActivity implements
     private EditText inputEmail, inputPassword;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
     private Button btnSignUp, btnLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,12 +150,26 @@ public class LoginActivity extends AppCompatActivity implements
         showProgressDialog();
         ParseUser current = ParseUser.getCurrentUser();
         if (null != current) {
-            Intent intentMain = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intentMain);
+            Intent i = null;
+            if(isFirstTime()){
+                i= new Intent(LoginActivity.this, MainActivity.class);
+            } else {
+                i= new Intent(LoginActivity.this, WellcomeActivity.class);
+            }
+
+            startActivity(i);
         }
         hideProgressDialog();
     }
 
+    public boolean isFirstTime() {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_first_use), Context.MODE_PRIVATE);
+        boolean result = sharedPref.getBoolean(getString(R.string.first_use_key), false);
+        sharedPref.edit().putBoolean(getString(R.string.first_use_key), true).commit();
+
+        return result;
+
+    }
     private void showProgressDialog() {
         loginProgress.setVisibility(View.VISIBLE);
     }

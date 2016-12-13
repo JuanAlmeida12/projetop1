@@ -56,6 +56,7 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
             } else {
                 holder.photo.setVisibility(View.GONE);
             }
+            holder.userName.setText(data.get(position).getParseUser("owner").fetchIfNeeded().getString("name"));
             holder.content.setText(data.get(position).getParseObject("subtype").getString("content"));
             ParseFile userimage = data.get(position).getParseUser("owner").fetchIfNeeded().getParseFile("image");
             getImage(userimage != null ? userimage.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png", holder.image);
