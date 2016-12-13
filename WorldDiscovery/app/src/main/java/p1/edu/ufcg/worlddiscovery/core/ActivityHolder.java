@@ -13,10 +13,12 @@ import p1.edu.ufcg.worlddiscovery.R;
 public class ActivityHolder extends RecyclerView.ViewHolder {
     public TextView content;
     public ImageView image;
+    public ImageView photo;
     public ActivityHolder(View itemView) {
         super(itemView);
 
         content = (TextView) itemView.findViewById(R.id.content_activity);
         image = (ImageView) itemView.findViewById(R.id.image_activity);
+        photo = (ImageView) itemView.findViewById(R.id.photo_activity);
     }
 }

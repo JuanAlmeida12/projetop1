@@ -45,6 +45,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.PlaceDetectionApi;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
@@ -56,6 +57,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
+import p1.edu.ufcg.worlddiscovery.core.Point;
 import p1.edu.ufcg.worlddiscovery.dialogs.PhotoEditDialog;
 import p1.edu.ufcg.worlddiscovery.fragments.AboutFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment;
@@ -70,6 +72,7 @@ import p1.edu.ufcg.worlddiscovery.fragments.UserDetailDetailFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
+import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
 
 public class MainActivity extends AppCompatActivity
@@ -82,13 +85,14 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Bundle about;
+    public static PlaceLikelihood currentPlace;
     ParseUser user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
 
@@ -99,7 +103,6 @@ public class MainActivity extends AppCompatActivity
         toolbar.setBackgroundColor(getResources().getColor(R.color.whitebg));
         toolbar.setTitleTextColor(getResources().getColor(R.color.cardview_dark_background));
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-
 
 
         if (mGoogleApiClient == null) {
@@ -160,16 +163,20 @@ public class MainActivity extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
-        Log.e("dsajdjsa","na func");
+        Log.e("dsajdjsa", "na func");
         PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
                 .getCurrentPlace(mGoogleApiClient, null);
         result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
             @Override
             public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
+                Log.i("dasdasfaga", likelyPlaces.getCount() + "");
                 for (PlaceLikelihood placeLikelihood : likelyPlaces) {
                     Log.i("dasdasfaga", String.format("Place '%s' has likelihood: %g",
                             placeLikelihood.getPlace().getName(),
                             placeLikelihood.getLikelihood()));
+                    if (placeLikelihood.getLikelihood() > 90) {
+                        currentPlace = placeLikelihood;
+                    }
                 }
                 likelyPlaces.release();
             }
@@ -279,6 +286,19 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.7
 
+        switch (item.getItemId()) {
+            case R.id.action_checkin:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Fazer Checkin em "+ currentPlace.getPlace().getName())
+                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                PointUtils.visitedPoint(currentPlace.getPlace().getId());
+                            }
+                        });
+                builder.create().show();
+                break;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -299,6 +319,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else if (id == R.id.nav_feed) {
+            getActualPlace();
             setFragment(new FeedFragment());
         } else if (id == R.id.nav_badges) {
             setFragment(new BadgesFragment());
@@ -361,10 +382,10 @@ public class MainActivity extends AppCompatActivity
         }
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if(mLastLocation != null){
+        if (mLastLocation != null) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
             getActualPlace();
-        }else{
+        } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Ativar GPS")
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {

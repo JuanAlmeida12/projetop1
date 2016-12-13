@@ -17,7 +17,6 @@ import java.util.HashMap;
 public class UserUtils {
 
 
-
     public static void updateUser(final HashMap<String, Object> update) {
 
     }
@@ -32,6 +31,9 @@ public class UserUtils {
     }
 
     public static void updateScore(final int score) {
+        int current_score = ParseUser.getCurrentUser().getInt("score");
+        ParseUser.getCurrentUser().put("score", current_score == Integer.MIN_VALUE ? current_score + score : score);
+        ParseUser.getCurrentUser().saveInBackground();
     }
 
     public static String formattedName(String name) {

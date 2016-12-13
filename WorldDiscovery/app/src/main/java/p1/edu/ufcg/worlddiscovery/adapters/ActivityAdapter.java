@@ -12,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.firebase.database.DataSnapshot;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseObject;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,19 +22,18 @@ import java.util.List;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.core.ActivityHolder;
+import p1.edu.ufcg.worlddiscovery.utils.ActivitiesUtils;
 
 /**
  * Created by root on 04/10/16.
  */
 public class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
 
-    private List<DataSnapshot> data;
-    private List<DataSnapshot> users;
+    private List<ParseObject> data;
     private Context ctx;
 
     public ActivityAdapter(Context ctx) {
         this.ctx = ctx;
-        this.users = new ArrayList<>();
         data = new ArrayList<>();
     }
 
@@ -46,13 +48,25 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
 
     @Override
     public void onBindViewHolder(ActivityHolder holder, int position) {
-        holder.content.setText(data.get(position).child("content").getValue(String.class));
-        getImage(users.get(position).child("photoURL").getValue(String.class),holder.image);
+        try {
+            if (data.get(position).getInt("type") == ActivitiesUtils.ACTIVITY_NEW_PHOTO) {
+                holder.photo.setVisibility(View.VISIBLE);
+
+                getImage(data.get(position).getParseObject("subtype").fetchIfNeeded().getParseFile("photo").getUrl(), holder.photo);
+            } else {
+                holder.photo.setVisibility(View.GONE);
+            }
+            holder.content.setText(data.get(position).getParseObject("subtype").getString("content"));
+            ParseFile userimage = data.get(position).getParseUser("owner").fetchIfNeeded().getParseFile("image");
+            getImage(userimage != null ? userimage.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png", holder.image);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void add(DataSnapshot activity, DataSnapshot user){
+    public void add(ParseObject activity) {
         data.add(activity);
-        users.add(user);
+        Log.e("asdddddd", activity.getString("ownerid"));
         notifyDataSetChanged();
     }
 

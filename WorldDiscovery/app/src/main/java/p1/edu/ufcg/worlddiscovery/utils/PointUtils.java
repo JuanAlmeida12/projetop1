@@ -29,7 +29,7 @@ public class PointUtils {
     }
 
     public static void visitedPoint(String id) {
-
+        ActivitiesUtils.newPlace(id);
     }
 
     public static void searchPoint(String query, ChildEventListener listener) {

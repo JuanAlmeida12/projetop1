@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.parse.ParseUser;
 
 import java.util.Iterator;
 
@@ -65,37 +66,6 @@ public class RecentActivities extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_user_activities, container, false);
         final ActivityAdapter adapter = new ActivityAdapter(getContext());
-        ActivitiesUtils.getRecentActivities(new ValueEventListener() {
-
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Iterator<DataSnapshot> i = dataSnapshot.getChildren().iterator();
-                while (i.hasNext()) {
-                    final DataSnapshot activity = i.next();
-                    if (FollowUtils.following(activity.child("owner").getValue(String.class))) {
-//                        UserUtils.getUser(activity.child("owner").getValue(String.class), new ValueEventListener() {
-//                            @Override
-//                            public void onDataChange(DataSnapshot user) {
-//                                if (user.exists()) {
-//                                    Log.d("ffg", user.child("photoURL").getValue(String.class));
-//                                    adapter.add(activity, user);
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onCancelled(DatabaseError databaseError) {
-//
-//                            }
-//                        });
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(getContext());
         RecyclerView recyclerView = (RecyclerView) v.findViewById(R.id.recycler_activity);
         recyclerView.setHasFixedSize(true);
@@ -105,6 +75,8 @@ public class RecentActivities extends Fragment {
 
         recyclerView.setAdapter(adapter);
         recyclerView.setNestedScrollingEnabled(false);
+
+        ActivitiesUtils.getUserActivity(ParseUser.getCurrentUser().getUsername(), adapter);
 
         return v;
     }
