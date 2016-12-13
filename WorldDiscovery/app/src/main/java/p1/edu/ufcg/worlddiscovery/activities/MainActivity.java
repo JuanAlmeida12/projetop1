@@ -6,25 +6,26 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -33,6 +34,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.test.mock.MockPackageManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
@@ -42,13 +44,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.PlaceDetectionApi;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
@@ -60,9 +62,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
-import p1.edu.ufcg.worlddiscovery.core.Point;
 import p1.edu.ufcg.worlddiscovery.dialogs.PhotoEditDialog;
-import p1.edu.ufcg.worlddiscovery.fragments.AboutFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.FeedFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.GalleryFragment;
@@ -71,7 +71,6 @@ import p1.edu.ufcg.worlddiscovery.fragments.PlacesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.RecentActivities;
 import p1.edu.ufcg.worlddiscovery.fragments.SearchFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.SobreFragment;
-import p1.edu.ufcg.worlddiscovery.fragments.UserDetailDetailFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
@@ -90,6 +89,83 @@ public class MainActivity extends AppCompatActivity
     private Bundle about;
     public static PlaceLikelihood currentPlace;
     ParseUser user;
+    private static final int REQUEST_CODE_PERMISSION = 2;
+    String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+    String[] mPermissionArray = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 100;
+    private static final int REQUEST_PERMISSION_SETTING = 101;
+
+    private SharedPreferences permissionStatus;
+    private boolean sentToSettings = false;
+
+    private void testeMarshmallow() {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //Show Information about why you need the permission
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Need Storage Permission");
+                builder.setMessage("This app needs storage permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                        @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+
+                });
+                builder.show();
+            } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,false)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Need Storage Permission");
+                builder.setMessage("This app needs storage permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        sentToSettings = true;
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+                        Toast.makeText(getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
+                    }
+
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+
+            } else {
+                    ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+            }
+
+            SharedPreferences.Editor editor = permissionStatus.edit();
+            editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE,true);
+            editor.commit();
+
+        } else {
+                proceedAfterPermission();
+        }
+
+    }
+
+    private void proceedAfterPermission() {
+        Toast.makeText(getBaseContext(), "We got the Storage Permission", Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,6 +174,9 @@ public class MainActivity extends AppCompatActivity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+
+        permissionStatus = getSharedPreferences("permissionStatus",MODE_PRIVATE);
+        testeMarshmallow();
 
         Intent serviceIntent = new Intent(this, HandleGeofenceService.class);
         startService(serviceIntent);
@@ -153,6 +232,23 @@ public class MainActivity extends AppCompatActivity
 
         setUpUserInfo();
         toolbar.setTitle(getString(R.string.app_name));
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.e("Req Code", "" + requestCode);
+        if (requestCode == REQUEST_CODE_PERMISSION) {
+            if (grantResults.length == 1 &&
+                    grantResults[0] == MockPackageManager.PERMISSION_GRANTED) {
+
+                // Success Stuff here
+
+            } else {
+                // Failure Stuff
+            }
+        }
+
     }
 
     private void getActualPlace() {
@@ -235,7 +331,7 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-           // super.onBackPressed();
+            // super.onBackPressed();
             finish();
         }
     }
@@ -399,6 +495,7 @@ public class MainActivity extends AppCompatActivity
             myLocation = locationManager.getLastKnownLocation(provider);
         }
 
+        mLastLocation = myLocation;
         return myLocation;
     }
 
