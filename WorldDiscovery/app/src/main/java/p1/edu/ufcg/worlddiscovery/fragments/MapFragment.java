@@ -2,15 +2,22 @@ package p1.edu.ufcg.worlddiscovery.fragments;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,14 +51,8 @@ import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.tasks.GooglePlacesReadTask;
 import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback {
+
+public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, LocationListener {
 
 
     public static final String LNG = "lng";
@@ -64,31 +65,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     private double myLongitude;
 
     public MapFragment() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment MapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(double latitude, double longitude) {
-        MapFragment fragment = new MapFragment();
-        Bundle args = new Bundle();
-        args.putDouble(LAT, latitude);
-        args.putDouble(LNG, longitude);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        myLatitude = getArguments().getDouble(LAT);
-        myLongitude = getArguments().getDouble(LNG);
     }
 
     @Override
@@ -97,6 +74,28 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         // Inflate the layout for this fragment
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         // Create an instance of GoogleAPIClient.
+
+        if ((ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ){
+            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},0);
+        }
+        LocationManager manager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { //if gps is disabled
+            displayPromptForEnablingGPS();
+        }
+
+
+        manager.requestLocationUpdates(
+                LocationManager.NETWORK_PROVIDER,
+                1000 * 60 * 1,
+                10, (LocationListener) this);
+        if (manager != null) {
+            if(manager.getLastKnownLocation(LocationManager.GPS_PROVIDER) != null){
+                myLatitude = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+                myLongitude = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+            }
+        }
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -188,5 +187,48 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     @Override
     public void onResult(@NonNull Status status) {
 
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
+    private void displayPromptForEnablingGPS() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(getContext());
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Please enable location services by clicking ok";
+
+        builder.setMessage(message)
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                startActivity(new Intent(action));
+                                dialog.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.create().show();
     }
 }

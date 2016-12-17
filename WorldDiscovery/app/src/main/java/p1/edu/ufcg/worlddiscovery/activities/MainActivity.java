@@ -26,6 +26,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -97,6 +98,17 @@ public class MainActivity extends AppCompatActivity
 
     private SharedPreferences permissionStatus;
     private boolean sentToSettings = false;
+    private LocationManager manager;
+    private FragmentManager fragmentManager;
+
+    private Fragment currentFragment;
+    private MapFragment mapFragment;
+    private FeedFragment feedFragment;
+    private BadgesFragment badgesFragment;
+    private PlacesFragment placesFragment;
+    private GalleryFragment galleryFragment;
+    private RecentActivities recentActivitiesFragment;
+    private SobreFragment sobreFragment;
 
     private void testeMarshmallow() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -167,6 +179,29 @@ public class MainActivity extends AppCompatActivity
         Toast.makeText(getBaseContext(), "We got the Storage Permission", Toast.LENGTH_LONG).show();
     }
 
+    private void displayPromptForEnablingGPS() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Please enable location services by clicking ok";
+
+        builder.setMessage(message)
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                startActivity(new Intent(action));
+                                dialog.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.create().show();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -187,6 +222,9 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
 
+
+
+
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
                     .addConnectionCallbacks(this)
@@ -197,9 +235,7 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
-
-        Snackbar
-                .make(drawer, R.string.welcome, Snackbar.LENGTH_LONG).show();
+        setUpFragments();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -418,6 +454,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setUpFragments(){
+        manager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { //if gps is disabled
+            displayPromptForEnablingGPS();
+        }
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},0);
+            //ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
+        }
+
+        mapFragment = new MapFragment();
+        feedFragment = new FeedFragment();
+        badgesFragment = new BadgesFragment();
+        placesFragment = new PlacesFragment();
+        galleryFragment = new GalleryFragment();
+        recentActivitiesFragment = RecentActivities.newInstance();
+        sobreFragment = new SobreFragment();
+
+//        currentFragment = mapFragment;
+//        fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.replace(R.id.fragment_container, mapFragment, MAP_TAG);
+//        fragmentTransaction.commit();
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -425,25 +487,25 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
+            setFragment(mapFragment);
         } else if (id == R.id.nav_feed) {
             getActualPlace();
-            setFragment(new FeedFragment());
+            setFragment(feedFragment);
         } else if (id == R.id.nav_badges) {
-            setFragment(new BadgesFragment());
+            setFragment(badgesFragment);
         } else if (id == R.id.nav_camera) {
             dispatchTakePictureIntent();
         } else if (id == R.id.nav_places) {
-            setFragment(new PlacesFragment());
+            setFragment(placesFragment);
         } else if (id == R.id.nav_gallery) {
-            setFragment(new GalleryFragment());
+            setFragment(galleryFragment);
         } else if (id == R.id.nav_actions_user) {
-            setFragment(RecentActivities.newInstance());
+            setFragment(recentActivitiesFragment);
         } else if (id == R.id.nav_share) {
             //dispatchTakePictureIntent();
         } else if (id == R.id.nav_settings) {
         } else if (id == R.id.nav_about) {
-            setFragment(new SobreFragment());
+            setFragment(sobreFragment);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -475,60 +537,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     private Location getLocation() {
-        LocationManager locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
-        Location myLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            return null;
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) ){
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},0);
         }
+        Location myLocation = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
 
         // Location wasn't found, check the next most accurate place for the current location
         if (myLocation == null) {
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_COARSE);
             // Finds a provider that matches the criteria
-            String provider = locationManager.getBestProvider(criteria, true);
+            String provider = manager.getBestProvider(criteria, true);
             // Use the provider to get the last known location
-            myLocation = locationManager.getLastKnownLocation(provider);
+            myLocation = manager.getLastKnownLocation(provider);
         }
 
-        mLastLocation = myLocation;
         return myLocation;
     }
 
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-//        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
-//                mGoogleApiClient);
-        mLastLocation = getLocation();
-        if (mLastLocation != null) {
-            setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-            getActualPlace();
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Ativar GPS")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // FIRE ZE MISSILES!
-                        }
-                    });
-            builder.create().show();
-        }
-
 
     }
 

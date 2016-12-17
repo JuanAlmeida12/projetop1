@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,6 +38,7 @@ public class PlacesFragment extends Fragment implements OnMapReadyCallback, Goog
     private GoogleApiClient mGoogleApiClient;
     private LinearLayoutManager mLayoutManager;
     private UserPlacesAdapter adapter;
+    LinearLayout layoutNoActivities;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -74,6 +76,11 @@ public class PlacesFragment extends Fragment implements OnMapReadyCallback, Goog
         });
 
 
+        if (adapter.getItemCount() > 0){
+            layoutNoActivities = (LinearLayout) mView.findViewById(R.id.layout_no_places);
+            layoutNoActivities.setVisibility(View.GONE);
+
+        }
         return mView;
     }
 

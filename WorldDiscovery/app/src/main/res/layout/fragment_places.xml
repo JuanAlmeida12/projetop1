@@ -1,7 +1,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:background="@color/whitebg"
+    android:orientation="vertical"
     android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_no_places"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="vertical"
+        android:background="#e4e4e4">
+
+        <ImageView
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/no_places"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:paddingLeft="50dp"
+            android:gravity="center"
+            android:paddingRight="50dp"
+            android:textStyle="bold"
+            android:text="Você não fez nenhum Check-In"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:paddingLeft="50dp"
+            android:paddingRight="50dp"
+            android:textStyle="normal"
+            android:text="Os lugares que você visitar aparecerão aqui."/>
+    </LinearLayout>
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/user_places_recycle"

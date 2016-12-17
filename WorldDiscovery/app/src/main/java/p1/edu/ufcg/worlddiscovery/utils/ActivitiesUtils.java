@@ -56,7 +56,9 @@ public class ActivitiesUtils {
         newActivity(ACTIVITY_NEW_PHOTO, photo);
     }
 
-    public static void getUserActivity(String id, final ActivityAdapter adapter) {
+    public static int getUserActivity(String id, final ActivityAdapter adapter) {
+        int output = -1;
+
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Activity");
         query.whereEqualTo("ownerid", id);
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -68,10 +70,21 @@ public class ActivitiesUtils {
                 }
             }
         });
+
+
+        try{
+            output = query.count();
+        }
+        catch (ParseException e){
+            e.printStackTrace();
+        }
+
+        return output;
     }
 
     public static void getActivityFeed(final ActivityAdapter adapter) {
         ParseRelation follows = ParseUser.getCurrentUser().getRelation("follows");
+
         final ParseQuery<ParseUser> query = follows.getQuery();
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -86,10 +99,12 @@ public class ActivitiesUtils {
                                 list) {
                             adapter.add(activity);
                         }
+
                     }
                 });
             }
         });
+
     }
 
     public static void getRecentActivities(final ValueEventListener listener) {
