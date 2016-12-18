@@ -93,17 +93,17 @@ public class UserPlaces extends Fragment implements OnMapReadyCallback, GoogleAp
         recyclerView.setAdapter(adapter);
         recyclerView.setNestedScrollingEnabled(false);
 
-        PointUtils.getUserPoints(userId, new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                adapter.addPoint(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
+//        PointUtils.getUserPoints(userId, new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                adapter.addPoint(dataSnapshot);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
 
 
         return mView;

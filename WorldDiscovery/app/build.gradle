@@ -49,6 +49,7 @@ dependencies {
     compile 'com.flipboard:bottomsheet-commons:1.5.2'
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.google.maps.android:android-maps-utils:0.3+'
 
 }
 apply plugin: 'com.google.gms.google-services'

@@ -6,16 +6,21 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -31,6 +36,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.test.mock.MockPackageManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
@@ -40,27 +46,27 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.PlaceDetectionApi;
 import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
+import com.google.maps.android.SphericalUtil;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.net.URL;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
-import p1.edu.ufcg.worlddiscovery.core.Point;
 import p1.edu.ufcg.worlddiscovery.dialogs.PhotoEditDialog;
-import p1.edu.ufcg.worlddiscovery.fragments.AboutFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.FeedFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.GalleryFragment;
@@ -69,7 +75,6 @@ import p1.edu.ufcg.worlddiscovery.fragments.PlacesFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.RecentActivities;
 import p1.edu.ufcg.worlddiscovery.fragments.SearchFragment;
 import p1.edu.ufcg.worlddiscovery.fragments.SobreFragment;
-import p1.edu.ufcg.worlddiscovery.fragments.UserDetailDetailFragment;
 import p1.edu.ufcg.worlddiscovery.interfaces.Searchable;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
@@ -87,8 +92,119 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
     private Location mLastLocation;
     private Bundle about;
-    public static PlaceLikelihood currentPlace;
+    public static HashMap<String, String> currentPlace;
     ParseUser user;
+    private static final int REQUEST_CODE_PERMISSION = 2;
+    String mPermission = Manifest.permission.ACCESS_FINE_LOCATION;
+    String[] mPermissionArray = {Manifest.permission.ACCESS_FINE_LOCATION};
+    private static final int EXTERNAL_STORAGE_PERMISSION_CONSTANT = 100;
+    private static final int REQUEST_PERMISSION_SETTING = 101;
+
+    private SharedPreferences permissionStatus;
+    private boolean sentToSettings = false;
+    private LocationManager manager;
+    private FragmentManager fragmentManager;
+
+    private Fragment currentFragment;
+    private MapFragment mapFragment;
+    private FeedFragment feedFragment;
+    private BadgesFragment badgesFragment;
+    private PlacesFragment placesFragment;
+    private GalleryFragment galleryFragment;
+    private RecentActivities recentActivitiesFragment;
+    private SobreFragment sobreFragment;
+
+    private void testeMarshmallow() {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                //Show Information about why you need the permission
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Need Storage Permission");
+                builder.setMessage("This app needs storage permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+
+                });
+                builder.show();
+            } else if (permissionStatus.getBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, false)) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Need Storage Permission");
+                builder.setMessage("This app needs storage permission.");
+                builder.setPositiveButton("Grant", new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                        sentToSettings = true;
+                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        Uri uri = Uri.fromParts("package", getPackageName(), null);
+                        intent.setData(uri);
+                        startActivityForResult(intent, REQUEST_PERMISSION_SETTING);
+                        Toast.makeText(getBaseContext(), "Go to Permissions to Grant Storage", Toast.LENGTH_LONG).show();
+                    }
+
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+
+            } else {
+                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, EXTERNAL_STORAGE_PERMISSION_CONSTANT);
+            }
+
+            SharedPreferences.Editor editor = permissionStatus.edit();
+            editor.putBoolean(Manifest.permission.WRITE_EXTERNAL_STORAGE, true);
+            editor.commit();
+
+        } else {
+            proceedAfterPermission();
+        }
+
+    }
+
+    private void proceedAfterPermission() {
+        Toast.makeText(getBaseContext(), "We got the Storage Permission", Toast.LENGTH_LONG).show();
+    }
+
+    private void displayPromptForEnablingGPS() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(this);
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Please enable location services by clicking ok";
+
+        builder.setMessage(message)
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                startActivity(new Intent(action));
+                                dialog.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.create().show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +213,9 @@ public class MainActivity extends AppCompatActivity
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         setContentView(R.layout.activity_main);
+
+        permissionStatus = getSharedPreferences("permissionStatus", MODE_PRIVATE);
+        testeMarshmallow();
 
         Intent serviceIntent = new Intent(this, HandleGeofenceService.class);
         startService(serviceIntent);
@@ -117,12 +236,9 @@ public class MainActivity extends AppCompatActivity
                     .build();
         }
 
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_FINE_LOCATION);
-
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS)
+                Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
             // Should we show an explanation?
@@ -151,6 +267,8 @@ public class MainActivity extends AppCompatActivity
 
         Snackbar
                 .make(drawer, R.string.welcome, Snackbar.LENGTH_LONG).show();
+
+        setUpFragments();
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -193,9 +311,7 @@ public class MainActivity extends AppCompatActivity
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-
-
+                    setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
                 } else {
 
                     // permission denied, boo! Disable the
@@ -207,37 +323,6 @@ public class MainActivity extends AppCompatActivity
             // other 'case' lines to check for other
             // permissions this app might request
         }
-    }
-
-    private void getActualPlace() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-        Log.e("dsajdjsa", "na func");
-        PendingResult<PlaceLikelihoodBuffer> result = Places.PlaceDetectionApi
-                .getCurrentPlace(mGoogleApiClient, null);
-        result.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
-            @Override
-            public void onResult(PlaceLikelihoodBuffer likelyPlaces) {
-                Log.i("dasdasfaga", likelyPlaces.getCount() + "");
-                for (PlaceLikelihood placeLikelihood : likelyPlaces) {
-                    Log.i("dasdasfaga", String.format("Place '%s' has likelihood: %g",
-                            placeLikelihood.getPlace().getName(),
-                            placeLikelihood.getLikelihood()));
-                    if (placeLikelihood.getLikelihood() > 90) {
-                        currentPlace = placeLikelihood;
-                    }
-                }
-                likelyPlaces.release();
-            }
-        });
     }
 
     private void getImage(final String imageUrl, final ImageView image) {
@@ -274,8 +359,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         final View header = navigationView.getHeaderView(0);
 
-        String score = user.getString("score") != null ? user.getString("score") : "0";
-        String since = user.getCreatedAt().toString();
+        String score = user.getInt("score") != Integer.MIN_VALUE ? user.getInt("score")+"" : "0";
+        String since = DateFormat.getDateFormat(this).format(user.getCreatedAt());
+
+        Log.e("dasd",user.getInt("score")+"");
 
         TextView userScore = (TextView) header.findViewById(R.id.user_nav_score);
         TextView userSince = (TextView) header.findViewById(R.id.user_nav_since);
@@ -289,7 +376,8 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            // super.onBackPressed();
+            finish();
         }
     }
 
@@ -346,12 +434,27 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.action_checkin:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Fazer Checkin em "+ currentPlace.getPlace().getName())
-                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                PointUtils.visitedPoint(currentPlace.getPlace().getId());
-                            }
-                        });
+                if (mLastLocation != null) {
+                    Log.e("ddasdas","location n é null");
+                    currentPlace = PointUtils.getCurrentLocal(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                } else {
+                    currentPlace = null;
+                }
+                if (currentPlace != null) {
+                    Log.e("ddasdas","atualn é null");
+                    builder.setMessage("Fazer Checkin em " + currentPlace.get("place_name"))
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    PointUtils.visitedPoint(currentPlace.get("id"), currentPlace.get("place_name"));
+                                }
+                            });
+                } else {
+                    builder.setMessage("Nenhum lugar proximo para fazer checkin! :(")
+                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                }
+                            });
+                }
                 builder.create().show();
                 break;
         }
@@ -367,6 +470,32 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setUpFragments() {
+        manager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+        if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) { //if gps is disabled
+            displayPromptForEnablingGPS();
+        }
+        if ((ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) &&
+                (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, 0);
+            //ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},0);
+        }
+
+        mapFragment = null;
+        feedFragment = new FeedFragment();
+        badgesFragment = new BadgesFragment();
+        placesFragment = new PlacesFragment();
+        galleryFragment = new GalleryFragment();
+        recentActivitiesFragment = RecentActivities.newInstance();
+        sobreFragment = new SobreFragment();
+
+//        currentFragment = mapFragment;
+//        fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.replace(R.id.fragment_container, mapFragment, MAP_TAG);
+//        fragmentTransaction.commit();
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -376,23 +505,22 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_home) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else if (id == R.id.nav_feed) {
-            getActualPlace();
-            setFragment(new FeedFragment());
+            setFragment(feedFragment);
         } else if (id == R.id.nav_badges) {
-            setFragment(new BadgesFragment());
+            setFragment(badgesFragment);
         } else if (id == R.id.nav_camera) {
             dispatchTakePictureIntent();
         } else if (id == R.id.nav_places) {
-            setFragment(new PlacesFragment());
+            setFragment(placesFragment);
         } else if (id == R.id.nav_gallery) {
-            setFragment(new GalleryFragment());
+            setFragment(galleryFragment);
         } else if (id == R.id.nav_actions_user) {
-            setFragment(RecentActivities.newInstance());
+            setFragment(recentActivitiesFragment);
         } else if (id == R.id.nav_share) {
             //dispatchTakePictureIntent();
         } else if (id == R.id.nav_settings) {
         } else if (id == R.id.nav_about) {
-            setFragment(new SobreFragment());
+            setFragment(sobreFragment);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -441,18 +569,7 @@ public class MainActivity extends AppCompatActivity
                 mGoogleApiClient);
         if (mLastLocation != null) {
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
-            getActualPlace();
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setMessage("Ativar GPS")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // FIRE ZE MISSILES!
-                        }
-                    });
-            builder.create().show();
         }
-
 
     }
 
@@ -482,6 +599,10 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
+    }
+
+    public GoogleApiClient getmGoogleApiClient(){
+        return mGoogleApiClient;
     }
 
     protected void onStop() {

@@ -7,6 +7,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.adapters.ActivityAdapter;
@@ -16,6 +18,7 @@ import p1.edu.ufcg.worlddiscovery.utils.ActivitiesUtils;
 public class FeedFragment extends Fragment {
 
     private LinearLayoutManager mLayoutManager;
+    LinearLayout layoutNoActivities;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -31,7 +34,11 @@ public class FeedFragment extends Fragment {
         ActivityAdapter adapter = new ActivityAdapter(getContext());
         recyclerView.setAdapter(adapter);
 
-        ActivitiesUtils.getActivityFeed(adapter);
+
+        layoutNoActivities = (LinearLayout) mView.findViewById(R.id.layout_no_feed);
+        ProgressBar bar = (ProgressBar) mView.findViewById(R.id.progressFeed);
+        ActivitiesUtils.getActivityFeed(adapter, layoutNoActivities, bar);
+
 
         return mView;
     }

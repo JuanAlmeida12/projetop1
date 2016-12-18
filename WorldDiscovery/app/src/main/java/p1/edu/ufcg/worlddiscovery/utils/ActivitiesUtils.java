@@ -1,6 +1,8 @@
 package p1.edu.ufcg.worlddiscovery.utils;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -8,12 +10,14 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.w3c.dom.Comment;
 
@@ -38,9 +42,26 @@ public class ActivitiesUtils {
         activity.put("type", type);
         activity.put("activityid", id);
         activity.put("owner", ParseUser.getCurrentUser());
-        activity.put("subtype", subactivity);
+        switch (type) {
+            case ACTIVITY_NEW_PHOTO:
+                activity.put("post", subactivity);
+                break;
+            case ACTIVITY_NEW_BADGE:
+                activity.put("badge", subactivity);
+                break;
+            case ACTIVITY_NEW_PLACE:
+                activity.put("place", subactivity);
+                break;
+        }
         activity.put("ownerid", ParseUser.getCurrentUser().getUsername());
-        activity.saveInBackground();
+        activity.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null) {
+                    Log.e("dsa", e.getMessage());
+                }
+            }
+        });
     }
 
     public static void newPhoto(ParseFile file, String comment, String place) {
@@ -56,13 +77,22 @@ public class ActivitiesUtils {
         newActivity(ACTIVITY_NEW_PHOTO, photo);
     }
 
-    public static void getUserActivity(String id, final ActivityAdapter adapter) {
+    public static void getUserActivity(String id, final ActivityAdapter adapter, final View emptyLayout, final ProgressBar bar) {
+
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Activity");
         query.whereEqualTo("ownerid", id);
+        query.addDescendingOrder("createdAt");
+        bar.setVisibility(View.VISIBLE);
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> list, ParseException e) {
-                Log.e("dasdas", list.size()+"");
+                bar.setVisibility(View.GONE);
+                if (list.isEmpty()) {
+                    emptyLayout.setVisibility(View.VISIBLE);
+                } else {
+                    emptyLayout.setVisibility(View.GONE);
+                }
+                Log.e("dasdas", list.size() + "");
                 for (ParseObject activity : list) {
                     adapter.add(activity);
                 }
@@ -70,8 +100,10 @@ public class ActivitiesUtils {
         });
     }
 
-    public static void getActivityFeed(final ActivityAdapter adapter) {
+    public static void getActivityFeed(final ActivityAdapter adapter, final View emptyLayout, final ProgressBar bar) {
         ParseRelation follows = ParseUser.getCurrentUser().getRelation("follows");
+
+        bar.setVisibility(View.VISIBLE);
         final ParseQuery<ParseUser> query = follows.getQuery();
         query.findInBackground(new FindCallback<ParseUser>() {
             @Override
@@ -79,17 +111,26 @@ public class ActivitiesUtils {
                 ParseQuery<ParseObject> queryFeed = new ParseQuery<ParseObject>("Activity");
                 queryFeed.whereNotEqualTo("owner", ParseUser.getCurrentUser());
                 queryFeed.whereContainedIn("owner", list);
+                queryFeed.addDescendingOrder("createdAt");
                 queryFeed.findInBackground(new FindCallback<ParseObject>() {
                     @Override
                     public void done(List<ParseObject> list, ParseException e) {
+                        bar.setVisibility(View.GONE);
+                        if (list.isEmpty()) {
+                            emptyLayout.setVisibility(View.VISIBLE);
+                        } else {
+                            emptyLayout.setVisibility(View.GONE);
+                        }
                         for (ParseObject activity :
                                 list) {
                             adapter.add(activity);
                         }
+
                     }
                 });
             }
         });
+
     }
 
     public static void getRecentActivities(final ValueEventListener listener) {
@@ -100,15 +141,29 @@ public class ActivitiesUtils {
         return name[0] + " " + name[name.length - 1];
     }
 
-    public static void newPlace(String id, String placeName) {
-        ParseObject place = new ParseObject("Place");
-        place.put("message", "");
-        place.put("place", placeName);
-        place.put("placeid",id);
-        place.put("content", "Fez Checkin em " + placeName);
-        place.saveInBackground();
-        newActivity(ACTIVITY_NEW_PLACE, place);
+    public static void newPlace(final String id, final String placeName) {
+        ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Place");
+        query.whereEqualTo("ownerid", ParseUser.getCurrentUser().getUsername());
+        query.whereEqualTo("placeid", id);
+        query.getFirstInBackground(new GetCallback<ParseObject>() {
+            @Override
+            public void done(ParseObject parseObject, ParseException e) {
+                if (parseObject == null) {
 
-        UserUtils.updateScore(40);
+                    ParseObject place = new ParseObject("Place");
+                    place.put("message", "");
+                    place.put("place", placeName);
+                    place.put("placeid", id);
+                    place.put("ownerid", ParseUser.getCurrentUser().getUsername());
+                    place.put("content", "Fez Checkin em " + placeName);
+                    place.saveInBackground();
+                    newActivity(ACTIVITY_NEW_PLACE, place);
+
+                    UserUtils.updateScore(40);
+                } else {
+                    Log.e("sadas", "ja visitei");
+                }
+            }
+        });
     }
 }

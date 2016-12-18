@@ -76,7 +76,7 @@ public class PhotoUtil {
         userPhoto.put("description", description);
         userPhoto.saveInBackground();
 
-        ActivitiesUtils.newPhoto(parseFile, description, MainActivity.currentPlace != null ? MainActivity.currentPlace.getPlace().toString() : "");
+        ActivitiesUtils.newPhoto(parseFile, description, MainActivity.currentPlace != null ? MainActivity.currentPlace.get("place_name") : "");
 
         ParseUser user = ParseUser.getCurrentUser();
         user.add("photos", userPhoto);

@@ -46,6 +46,7 @@ public class Places {
         String placeName = "-NA-";
         String vicinity = "-NA-";
         String latitude = "";
+        String id = "";
         String longitude = "";
         String reference = "";
 
@@ -59,10 +60,12 @@ public class Places {
             latitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
             reference = googlePlaceJson.getString("reference");
+            id = googlePlaceJson.getString("place_id");
             googlePlaceMap.put("place_name", placeName);
             googlePlaceMap.put("vicinity", vicinity);
             googlePlaceMap.put("lat", latitude);
             googlePlaceMap.put("lng", longitude);
+            googlePlaceMap.put("id", id);
             googlePlaceMap.put("reference", reference);
         } catch (JSONException e) {
             e.printStackTrace();

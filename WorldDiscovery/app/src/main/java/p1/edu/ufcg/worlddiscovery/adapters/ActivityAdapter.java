@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.google.firebase.database.DataSnapshot;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -49,14 +50,29 @@ public class ActivityAdapter extends RecyclerView.Adapter<ActivityHolder> {
     @Override
     public void onBindViewHolder(ActivityHolder holder, int position) {
         try {
+            ParseObject mdata;
+            switch (data.get(position).getInt("type")) {
+                case ActivitiesUtils.ACTIVITY_NEW_BADGE:
+                    mdata = data.get(position).getParseObject("badge");
+                    break;
+                case ActivitiesUtils.ACTIVITY_NEW_PLACE:
+                    mdata = data.get(position).getParseObject("place");
+                    break;
+                default:
+                    mdata = data.get(position).getParseObject("post");
+                    break;
+
+            }
+            mdata.fetchIfNeeded();
             if (data.get(position).getInt("type") == ActivitiesUtils.ACTIVITY_NEW_PHOTO) {
                 holder.photo.setVisibility(View.VISIBLE);
 
-                getImage(data.get(position).getParseObject("subtype").fetchIfNeeded().getParseFile("photo").getUrl(), holder.photo);
+                getImage(mdata.getParseFile("photo").getUrl(), holder.photo);
             } else {
                 holder.photo.setVisibility(View.GONE);
             }
-            holder.content.setText(data.get(position).getParseObject("subtype").getString("content"));
+            holder.userName.setText(data.get(position).getParseUser("owner").fetchIfNeeded().getString("name"));
+            holder.content.setText(mdata.getString("content"));
             ParseFile userimage = data.get(position).getParseUser("owner").fetchIfNeeded().getParseFile("image");
             getImage(userimage != null ? userimage.getUrl() : "http://s3.amazonaws.com/37assets/svn/765-default-avatar.png", holder.image);
         } catch (ParseException e) {

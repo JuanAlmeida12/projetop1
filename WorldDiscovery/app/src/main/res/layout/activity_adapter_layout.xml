@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
-    android:layout_height="380dp"
+    android:layout_height="wrap_content"
     android:layout_margin="8dp">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <ImageView
             android:id="@+id/photo_activity"
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="200dp"
             android:layout_alignParentTop="true"
             android:scaleType="centerCrop" />
 
@@ -42,8 +42,15 @@
                 android:orientation="vertical">
 
                 <TextView
+                    android:id="@+id/name_user_activity"
+                    style="@style/Base.TextAppearance.AppCompat.Title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name" />
+
+                <TextView
                     android:id="@+id/content_activity"
-                    style="@style/Base.TextAppearance.AppCompat.SearchResult.Title"
+                    style="@style/Base.TextAppearance.AppCompat.Body1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Name" />

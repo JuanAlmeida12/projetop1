@@ -1,18 +1,12 @@
 package p1.edu.ufcg.worlddiscovery.adapters;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.content.Context;
-import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DataSnapshot;
+import com.parse.ParseObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +19,7 @@ import p1.edu.ufcg.worlddiscovery.dialogs.DialogMap;
  * Created by root on 04/10/16.
  */
 public class UserPlacesAdapter extends RecyclerView.Adapter<UserPlacesHolder> {
-    private List<DataSnapshot> points;
+    private List<ParseObject> points;
     private FragmentManager manager;
 
     public UserPlacesAdapter(FragmentManager manager) {
@@ -44,13 +38,13 @@ public class UserPlacesAdapter extends RecyclerView.Adapter<UserPlacesHolder> {
 
     @Override
     public void onBindViewHolder(UserPlacesHolder holder, int position) {
-        final DataSnapshot data = points.get(position);
-        holder.placeName.setText(data.child("placeName").getValue(String.class));
+        final ParseObject data = points.get(position);
+        holder.placeName.setText(data.getString("place"));
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogMap dialog = DialogMap.onNewInstance(data.child("lat").getValue(Double.class), data.child("lng").getValue(Double.class), data.child("placeName").getValue(String.class));
-                dialog.setCancelable(true);
+                DialogMap dialog = DialogMap.onNewInstance(data.getString("placeid"));
+                dialog.setCancelable(false);
                 dialog.show(manager, "");
             }
         });
@@ -61,7 +55,7 @@ public class UserPlacesAdapter extends RecyclerView.Adapter<UserPlacesHolder> {
         return points.size();
     }
 
-    public void addPoint(DataSnapshot dataSnapshot) {
+    public void addPoint(ParseObject dataSnapshot) {
         points.add(dataSnapshot);
         notifyDataSetChanged();
     }

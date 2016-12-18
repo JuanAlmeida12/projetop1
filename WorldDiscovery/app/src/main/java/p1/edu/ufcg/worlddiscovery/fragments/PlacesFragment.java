@@ -13,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -37,6 +39,7 @@ public class PlacesFragment extends Fragment implements OnMapReadyCallback, Goog
     private GoogleApiClient mGoogleApiClient;
     private LinearLayoutManager mLayoutManager;
     private UserPlacesAdapter adapter;
+    LinearLayout layoutNoActivities;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,7 +54,7 @@ public class PlacesFragment extends Fragment implements OnMapReadyCallback, Goog
         // Inflate the layout for this fragment
         View mView = inflater.inflate(R.layout.fragment_places, container, false);
         mLayoutManager = new LinearLayoutManager(getContext());
-        RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.user_places_recycle);
+        RecyclerView recyclerView = (RecyclerView) mView.findViewById(R.id.user_my_places_recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -61,18 +64,9 @@ public class PlacesFragment extends Fragment implements OnMapReadyCallback, Goog
         recyclerView.setAdapter(adapter);
         recyclerView.setNestedScrollingEnabled(false);
 
-        PointUtils.getUserPoints(userId, new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                adapter.addPoint(dataSnapshot);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
+        ProgressBar bar = (ProgressBar) mView.findViewById(R.id.progressMyPlaces);
+        layoutNoActivities = (LinearLayout) mView.findViewById(R.id.layout_no_places);
+        PointUtils.getUserPoints(ParseUser.getCurrentUser().getUsername(), adapter, layoutNoActivities, bar);
 
         return mView;
     }

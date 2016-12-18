@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import p1.edu.ufcg.worlddiscovery.core.Places;
+import p1.edu.ufcg.worlddiscovery.core.Point;
+import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 
 /**
  * Created by juanalmeida on 04/12/16.
@@ -42,6 +44,7 @@ public class PlacesDisplayTask extends AsyncTask<Object, Integer, List<HashMap<S
     @Override
     protected void onPostExecute(List<HashMap<String, String>> list) {
         googleMap.clear();
+        PointUtils.setNeabyPlaces(list);
         for (int i = 0; i < list.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
             HashMap<String, String> googlePlace = list.get(i);

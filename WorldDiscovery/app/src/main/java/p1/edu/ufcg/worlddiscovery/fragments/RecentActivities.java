@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -34,6 +36,7 @@ import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
  * create an instance of this fragment.
  */
 public class RecentActivities extends Fragment {
+    LinearLayout layoutNoActivities;
 
     public RecentActivities() {
         // Required empty public constructor
@@ -76,7 +79,10 @@ public class RecentActivities extends Fragment {
         recyclerView.setAdapter(adapter);
         recyclerView.setNestedScrollingEnabled(false);
 
-        ActivitiesUtils.getUserActivity(ParseUser.getCurrentUser().getUsername(), adapter);
+
+        layoutNoActivities = (LinearLayout) v.findViewById(R.id.layout_no_activities);
+        ProgressBar bar = (ProgressBar) v.findViewById(R.id.progressRecent);
+        ActivitiesUtils.getUserActivity(ParseUser.getCurrentUser().getUsername(), adapter, layoutNoActivities, bar);
 
         return v;
     }

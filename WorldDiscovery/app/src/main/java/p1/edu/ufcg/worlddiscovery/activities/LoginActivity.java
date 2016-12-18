@@ -1,11 +1,15 @@
 package p1.edu.ufcg.worlddiscovery.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.nfc.Tag;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
@@ -21,6 +25,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -50,11 +55,18 @@ import com.parse.LogInCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseFile;
 import com.parse.ParseUser;
+import com.parse.ProgressCallback;
 import com.parse.SaveCallback;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.net.URL;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
+import p1.edu.ufcg.worlddiscovery.utils.PhotoUtil;
 import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
 
 public class LoginActivity extends AppCompatActivity implements
@@ -66,6 +78,7 @@ public class LoginActivity extends AppCompatActivity implements
     private EditText inputEmail, inputPassword;
     private TextInputLayout inputLayoutEmail, inputLayoutPassword;
     private Button btnSignUp, btnLogin;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,12 +161,26 @@ public class LoginActivity extends AppCompatActivity implements
         showProgressDialog();
         ParseUser current = ParseUser.getCurrentUser();
         if (null != current) {
-            Intent intentMain = new Intent(LoginActivity.this, MainActivity.class);
-            startActivity(intentMain);
+            Intent i = null;
+            if(isFirstTime()){
+                i= new Intent(LoginActivity.this, MainActivity.class);
+            } else {
+                i= new Intent(LoginActivity.this, WellcomeActivity.class);
+            }
+
+            startActivity(i);
         }
         hideProgressDialog();
     }
 
+    public boolean isFirstTime() {
+        SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_first_use), Context.MODE_PRIVATE);
+        boolean result = sharedPref.getBoolean(getString(R.string.first_use_key), false);
+        sharedPref.edit().putBoolean(getString(R.string.first_use_key), true).commit();
+
+        return result;
+
+    }
     private void showProgressDialog() {
         loginProgress.setVisibility(View.VISIBLE);
     }
@@ -171,6 +198,9 @@ public class LoginActivity extends AppCompatActivity implements
                         } else {
                             Profile faceUser = Profile.getCurrentProfile();
                             user.put("name", faceUser.getName());
+                            if(user.isNew()){
+                                saveFaceImage(faceUser.getProfilePictureUri(400,400).toString());
+                            }
                             user.saveInBackground(new SaveCallback() {
                                                       @Override
                                                       public void done(ParseException e) {
@@ -250,5 +280,39 @@ public class LoginActivity extends AppCompatActivity implements
                     break;
             }
         }
+    }
+
+    private void saveFaceImage(final String imageUrl) {
+        new AsyncTask<Object, Object, Object>() {
+            Bitmap bitmap;
+
+            @Override
+            protected Object doInBackground(Object... objects) {
+                try {
+                    Log.d("image", imageUrl);
+                    URL url = new URL(imageUrl);
+                    bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                byte[] data = os.toByteArray();
+                ParseFile parseFile = new ParseFile(data);
+                parseFile.saveInBackground();
+
+                ParseUser user = ParseUser.getCurrentUser();
+                user.put("image", parseFile);
+                user.saveInBackground();
+            }
+        }.execute();
+
+
     }
 }

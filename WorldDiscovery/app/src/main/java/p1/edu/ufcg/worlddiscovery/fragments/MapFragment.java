@@ -2,15 +2,22 @@ package p1.edu.ufcg.worlddiscovery.fragments;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,14 +51,8 @@ import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.tasks.GooglePlacesReadTask;
 import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * to handle interaction events.
- * Use the {@link MapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback {
+
+public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, LocationListener {
 
 
     public static final String LNG = "lng";
@@ -64,16 +65,9 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     private double myLongitude;
 
     public MapFragment() {
-        // Required empty public constructor
+
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment MapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static MapFragment newInstance(double latitude, double longitude) {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
@@ -175,18 +169,51 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         googlePlacesReadTask.execute(toPass);
     }
 
-    private void createMarker(final DataSnapshot data) {
-        LatLng pointLatLng = new LatLng(data.child("lat").getValue(Double.class), data.child("lng").getValue(Double.class));
-        MarkerOptions marker = new MarkerOptions();
-        marker.position(pointLatLng);
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.mark);
-        marker.icon(icon);
-        marker.title(data.child("placeName").getValue(String.class));
-        mMap.addMarker(marker);
-    }
-
     @Override
     public void onResult(@NonNull Status status) {
 
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String s, int i, Bundle bundle) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String s) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String s) {
+
+    }
+
+    private void displayPromptForEnablingGPS() {
+        final AlertDialog.Builder builder =
+                new AlertDialog.Builder(getContext());
+        final String action = Settings.ACTION_LOCATION_SOURCE_SETTINGS;
+        final String message = "Please enable location services by clicking ok";
+
+        builder.setMessage(message)
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                startActivity(new Intent(action));
+                                dialog.dismiss();
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int idButton) {
+                                dialog.cancel();
+                            }
+                        });
+        builder.create().show();
     }
 }
