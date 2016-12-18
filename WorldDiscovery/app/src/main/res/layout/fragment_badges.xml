@@ -1,13 +1,215 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="p1.edu.ufcg.worlddiscovery.fragments.BadgesFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/bg_drawer"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_vertical"
+        android:padding="@dimen/activity_horizontal_margin"
+        android:elevation="4dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:text="Pontos:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/cardview_light_background"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
+
+        <TextView
+            android:text="0"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_height="wrap_content"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            />
+
+
+    </LinearLayout>
+    <GridLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Conquistas" />
+        android:columnCount="3"
+        android:orientation="horizontal"
+        android:rowCount="5">
 
-</FrameLayout>
+        <!-- TODO: Update blank fragment layout -->
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="0"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_1_a"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="0"
+            android:layout_rowWeight="1"
+            android:padding="10dp"
+            android:layout_columnWeight="1"
+            android:layout_column="1"
+            android:alpha="0.3"
+            android:src="@drawable/badge_1_b"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="0"
+            android:layout_rowWeight="1"
+            android:padding="10dp"
+            android:layout_columnWeight="1"
+            android:layout_column="2"
+            android:alpha="0.3"
+            android:src="@drawable/badge_1_c"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="1"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_2_a"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="1"
+            android:layout_rowWeight="1"
+            android:padding="10dp"
+            android:layout_columnWeight="1"
+            android:layout_column="1"
+            android:alpha="0.3"
+            android:src="@drawable/badge_2_b"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="1"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="2"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_2_c"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="2"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_3_a"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="2"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="1"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_3_b"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="2"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="2"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_3_c"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="3"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_4_a"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="3"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="1"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_4_b"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="3"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="2"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_4_c"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="4"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="0"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_5_a"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="4"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_column="1"
+            android:padding="10dp"
+            android:alpha="0.3"
+            android:src="@drawable/badge_5_b"
+            android:layout_height="0dp" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_row="4"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:padding="10dp"
+            android:layout_column="2"
+            android:alpha="0.3"
+            android:src="@drawable/badge_5_c"
+            android:layout_height="0dp" />
+    </GridLayout>
+
+</LinearLayout>
+
