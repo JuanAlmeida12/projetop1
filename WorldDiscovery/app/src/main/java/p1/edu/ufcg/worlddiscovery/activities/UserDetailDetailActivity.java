@@ -34,7 +34,6 @@ public class UserDetailDetailActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.detail_toolbar);
         setSupportActionBar(toolbar);
 
-        final FloatingActionMenu fab = (FloatingActionMenu) findViewById(R.id.fm_defaut);
         AppBarLayout appBarLayout = (AppBarLayout) findViewById(R.id.app_bar);
         appBarLayout.addOnOffsetChangedListener(new AppBarStateChangeListener() {
             private boolean animateShow = false;
@@ -52,7 +51,6 @@ public class UserDetailDetailActivity extends AppCompatActivity {
 
                         @Override
                         public void onAnimationEnd(Animation animation) {
-                            fab.setVisibility(View.GONE);
                             animateShow = true;
                         }
 
@@ -61,7 +59,6 @@ public class UserDetailDetailActivity extends AppCompatActivity {
 
                         }
                     });
-                    fab.startAnimation(animation);
                     //fab.setVisibility(View.GONE);
                 } else {
                     if (animateShow) {
@@ -70,7 +67,6 @@ public class UserDetailDetailActivity extends AppCompatActivity {
                         animation.setAnimationListener(new Animation.AnimationListener() {
                             @Override
                             public void onAnimationStart(Animation animation) {
-                                fab.setVisibility(View.VISIBLE);
                                 animateShow = false;
                             }
 
@@ -83,7 +79,6 @@ public class UserDetailDetailActivity extends AppCompatActivity {
 
                             }
                         });
-                        fab.startAnimation(animation);
                     }
                     //fab.setVisibility(View.VISIBLE);
                 }

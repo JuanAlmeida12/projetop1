@@ -2,33 +2,44 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="70dp"
+    android:layout_gravity="center_vertical|center_horizontal"
+    android:gravity="center_vertical|center_horizontal"
+    android:elevation="4dp"
+    android:background="@color/cardview_light_background"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_margin="@dimen/activity_horizontal_margin"
     android:orientation="horizontal">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="70dp"
+        android:layout_width="50dp"
         android:id="@+id/image_search"
-        android:layout_height="70dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_height="50dp"
         android:transitionName="@string/user_image_search"
-        android:src="@drawable/icon"
+        android:src="#e4e4e4"
         app:civ_border_color="@android:color/darker_gray"
         app:civ_border_width="2dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/name_search"
             style="@style/Base.TextAppearance.AppCompat.SearchResult.Title"
+            android:textSize="16sp"
+            android:textColor="@android:color/darker_gray"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Name" />
         <TextView
             android:id="@+id/type_search"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray"
+            android:textStyle="italic"
             style="@style/Base.TextAppearance.AppCompat.SearchResult.Subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -113,6 +113,7 @@ public class MainActivity extends AppCompatActivity
     private GalleryFragment galleryFragment;
     private RecentActivities recentActivitiesFragment;
     private SobreFragment sobreFragment;
+    Toolbar toolbar;
 
     private void testeMarshmallow() {
         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity
 
         Intent serviceIntent = new Intent(this, HandleGeofenceService.class);
         startService(serviceIntent);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(getResources().getColor(R.color.whitebg));
         toolbar.setTitleTextColor(getResources().getColor(R.color.cardview_dark_background));
@@ -503,23 +504,32 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
+            toolbar.setTitle(getString(R.string.app_name));
             setFragment(MapFragment.newInstance(mLastLocation.getLatitude(), mLastLocation.getLongitude()));
         } else if (id == R.id.nav_feed) {
+            toolbar.setTitle("Feed");
             setFragment(feedFragment);
         } else if (id == R.id.nav_badges) {
+            toolbar.setTitle("Conquistas");
             setFragment(badgesFragment);
         } else if (id == R.id.nav_camera) {
             dispatchTakePictureIntent();
         } else if (id == R.id.nav_places) {
+            toolbar.setTitle("Lugares");
             setFragment(placesFragment);
         } else if (id == R.id.nav_gallery) {
+            toolbar.setTitle("Galeria");
             setFragment(galleryFragment);
         } else if (id == R.id.nav_actions_user) {
+            toolbar.setTitle("Atividade Recente");
             setFragment(recentActivitiesFragment);
         } else if (id == R.id.nav_share) {
+            toolbar.setTitle("Compartilhar");
             //dispatchTakePictureIntent();
         } else if (id == R.id.nav_settings) {
+            toolbar.setTitle("Configurações");
         } else if (id == R.id.nav_about) {
+            toolbar.setTitle("Sobre");
             setFragment(sobreFragment);
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

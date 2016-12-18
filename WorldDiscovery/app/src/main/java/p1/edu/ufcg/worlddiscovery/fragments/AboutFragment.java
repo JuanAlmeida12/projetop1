@@ -1,8 +1,6 @@
 package p1.edu.ufcg.worlddiscovery.fragments;
 
 import android.app.Activity;
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -13,8 +11,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
-import com.github.clans.fab.FloatingActionMenu;
+import android.support.design.widget.FloatingActionButton;
 
 import java.util.HashMap;
 
@@ -30,19 +27,15 @@ import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
 public class AboutFragment extends Fragment {
 
     private TextView message;
-    private TextView address;
     private TextView gender;
     private TextView job;
 
     private EditText etJob;
-    private EditText etAddress;
     private RadioGroup rgGender;
     private EditText etMessage;
     private RadioButton male;
     private RadioButton female;
 
-    private FloatingActionMenu defaultMenu;
-    private FloatingActionMenu editMenu;
 
     private FloatingActionButton follow;
     private FloatingActionButton edit;
@@ -80,8 +73,6 @@ public class AboutFragment extends Fragment {
 
         Activity activity = AboutFragment.this.getActivity();
 
-        defaultMenu = (FloatingActionMenu) activity.findViewById(R.id.fm_defaut);
-        editMenu = (FloatingActionMenu) activity.findViewById(R.id.fm_edit);
 
         edit = (FloatingActionButton) activity.findViewById(R.id.fb_edit);
         save = (FloatingActionButton) activity.findViewById(R.id.fb_save);
@@ -99,11 +90,8 @@ public class AboutFragment extends Fragment {
 
         gender = (TextView) mView.findViewById(R.id.userGender);
 
-        address = (TextView) mView.findViewById(R.id.userAddress);
-
         message = (TextView) mView.findViewById(R.id.userMessage);
 
-        etAddress = (EditText) mView.findViewById(R.id.et_address);
         etJob = (EditText) mView.findViewById(R.id.et_job);
         etMessage = (EditText) mView.findViewById(R.id.et_message);
         rgGender = (RadioGroup) mView.findViewById(R.id.rg_gender);
@@ -113,11 +101,6 @@ public class AboutFragment extends Fragment {
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editMenu.setVisibility(View.VISIBLE);
-                defaultMenu.setVisibility(View.GONE);
-                etAddress.setVisibility(View.VISIBLE);
-                etAddress.setText(address.getText());
-                address.setVisibility(View.GONE);
                 etJob.setVisibility(View.VISIBLE);
                 etJob.setText(job.getText());
                 job.setVisibility(View.GONE);
@@ -141,10 +124,7 @@ public class AboutFragment extends Fragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editMenu.setVisibility(View.GONE);
-                defaultMenu.setVisibility(View.VISIBLE);
-                etAddress.setVisibility(View.GONE);
-                address.setVisibility(View.VISIBLE);
+
                 etJob.setVisibility(View.GONE);
                 job.setVisibility(View.VISIBLE);
                 etMessage.setVisibility(View.GONE);
@@ -158,17 +138,6 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 HashMap<String, Object> update = new HashMap();
-
-                editMenu.setVisibility(View.GONE);
-                defaultMenu.setVisibility(View.VISIBLE);
-
-                String newAddress = etAddress.getText().toString();
-                etAddress.setVisibility(View.GONE);
-                address.setVisibility(View.VISIBLE);
-                if (!address.getText().toString().equals(newAddress)) {
-                    address.setText(newAddress);
-                    update.put("city", newAddress);
-                }
 
                 String newJob = etJob.getText().toString();
                 etJob.setVisibility(View.GONE);
@@ -199,7 +168,6 @@ public class AboutFragment extends Fragment {
 
         job.setText(about.getString(UserDetailDetailFragment.JOB_KEY));
         gender.setText(about.getString(UserDetailDetailFragment.GENDER_KEY));
-        address.setText(about.getString(UserDetailDetailFragment.ADDRESS_KEY));
         message.setText(about.getString(UserDetailDetailFragment.MESSAGE_KEY));
 
 

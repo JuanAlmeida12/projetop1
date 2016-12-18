@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.github.clans.fab.FloatingActionButton;
 import com.google.android.gms.ads.formats.NativeAd;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,6 +30,10 @@ import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.activities.UserDetailDetailActivity;
 import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
 import p1.edu.ufcg.worlddiscovery.utils.UserUtils;
+import android.support.design.widget.FloatingActionButton;
+import android.widget.Toast;
+
+import static android.support.design.R.styleable.FloatingActionButton;
 
 /**
  * A fragment representing a single UserDetail detail screen.
@@ -165,9 +168,9 @@ public class UserDetailDetailFragment extends Fragment {
 
     private void stateFollowFb(FloatingActionButton follow) {
         if (FollowUtils.following(userId)) {
-            follow.setLabelText(getString(R.string.unfollow));
+            Toast.makeText(getContext(),"Following",Toast.LENGTH_LONG).show();
         } else {
-            follow.setLabelText(getString(R.string.follow));
+            Toast.makeText(getContext(),"Unfollowing",Toast.LENGTH_LONG).show();
         }
     }
 

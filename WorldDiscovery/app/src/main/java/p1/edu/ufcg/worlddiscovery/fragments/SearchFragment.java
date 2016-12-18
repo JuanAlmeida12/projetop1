@@ -65,6 +65,7 @@ public class SearchFragment extends Fragment implements Searchable {
 
         adapter = new SearchAdapter(getContext());
         recyclerView.setAdapter(adapter);
+        recyclerView.invalidateItemDecorations();
         recyclerView.setNestedScrollingEnabled(false);
 
         return view;
