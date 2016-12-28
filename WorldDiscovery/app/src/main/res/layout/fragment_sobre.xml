@@ -1,13 +1,53 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@drawable/bg"
     tools:context="p1.edu.ufcg.worlddiscovery.fragments.SobreFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/logo_dark_icon" />
+
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="About" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="DESENVOLVIDO POR"
+        android:textColor="@color/whitebg"
+        android:gravity="center"
+        />
+    <TextView
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:textSize="16sp"
+        android:textColor="@color/whitebg"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="Acácio Leal\nDiego Tavares\nFelipe Diógenes\nGuilherme Corrêa\nJuan Almeida\nKelvin Sores\nPriscilla Barros"/>
 
-</FrameLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="VERSÃO WEB"
+        android:textColor="@color/whitebg"
+        android:gravity="center"
+        />
+    <TextView
+        android:layout_marginTop="@dimen/activity_horizontal_margin"
+        android:layout_width="match_parent"
+        android:textSize="16sp"
+        android:textColor="@color/whitebg"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:text="https://worlddiscovery.herokuapp.com"/>
+
+
+</LinearLayout>
