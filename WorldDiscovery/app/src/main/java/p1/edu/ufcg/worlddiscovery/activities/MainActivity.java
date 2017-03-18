@@ -61,6 +61,7 @@ import com.parse.FunctionCallback;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.net.URL;
@@ -230,6 +231,20 @@ public class MainActivity extends AppCompatActivity
         toolbar.setBackgroundColor(getResources().getColor(R.color.whitebg));
         toolbar.setTitleTextColor(getResources().getColor(R.color.cardview_dark_background));
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//
+//        HashMap<String, Object> params = new HashMap<String, Object>();
+//        params.put("userid",ParseUser.getCurrentUser().getObjectId());
+//        ParseCloud.callFunctionInBackground("getBadgeProgess", params, new FunctionCallback<ParseObject[]>() {
+//            public void done(ParseObject[] ratings, ParseException e) {
+//                if (e == null) {
+//                    Log.d("asdasda",ratings.length+"");
+//                    // ratings is 4.5
+//                }
+//                else
+//                    Log.d("NO RESPONSE",e + "");
+//            }
+//        });
+
 
 
         if (mGoogleApiClient == null) {
