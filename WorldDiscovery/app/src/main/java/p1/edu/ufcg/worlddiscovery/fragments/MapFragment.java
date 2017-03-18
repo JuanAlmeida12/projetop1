@@ -1,55 +1,33 @@
 package p1.edu.ufcg.worlddiscovery.fragments;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.Iterator;
-import java.util.zip.Inflater;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.tasks.GooglePlacesReadTask;
-import p1.edu.ufcg.worlddiscovery.utils.PointUtils;
 
 
 public class MapFragment extends Fragment implements ResultCallback<Status>, OnMapReadyCallback, LocationListener {
@@ -63,6 +41,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     private View mView;
     private double myLatitude;
     private double myLongitude;
+    private SupportMapFragment mapFragment;
 
     public MapFragment() {
 
@@ -92,7 +71,7 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
         mView = inflater.inflate(R.layout.fragment_map, container, false);
         // Create an instance of GoogleAPIClient.
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+        mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -172,6 +151,12 @@ public class MapFragment extends Fragment implements ResultCallback<Status>, OnM
     @Override
     public void onResult(@NonNull Status status) {
 
+    }
+
+    @Override
+    public void onDetach() {
+//        getFragmentManager().beginTransaction().remove(mapFragment).commit();
+        super.onDetach();
     }
 
     @Override

@@ -53,6 +53,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.parse.LogInCallback;
 import com.parse.Parse;
+import com.parse.ParseAnalytics;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseFile;
@@ -63,6 +64,8 @@ import com.parse.SaveCallback;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 import p1.edu.ufcg.worlddiscovery.R;
 import p1.edu.ufcg.worlddiscovery.service.HandleGeofenceService;
@@ -94,6 +97,9 @@ public class LoginActivity extends AppCompatActivity implements
         inputEmail = (EditText) findViewById(R.id.input_email);
         inputPassword = (EditText) findViewById(R.id.input_password);
         btnSignUp = (Button) findViewById(R.id.btn_signup);
+
+
+        ParseAnalytics.trackAppOpenedInBackground(getIntent());
 
         //Login Email and Password
         btnLogin = (Button) findViewById(R.id.btn_login);
@@ -162,10 +168,10 @@ public class LoginActivity extends AppCompatActivity implements
         ParseUser current = ParseUser.getCurrentUser();
         if (null != current) {
             Intent i = null;
-            if(isFirstTime()){
-                i= new Intent(LoginActivity.this, MainActivity.class);
+            if (isFirstTime()) {
+                i = new Intent(LoginActivity.this, MainActivity.class);
             } else {
-                i= new Intent(LoginActivity.this, WellcomeActivity.class);
+                i = new Intent(LoginActivity.this, WellcomeActivity.class);
             }
 
             startActivity(i);
@@ -181,6 +187,7 @@ public class LoginActivity extends AppCompatActivity implements
         return result;
 
     }
+
     private void showProgressDialog() {
         loginProgress.setVisibility(View.VISIBLE);
     }
@@ -198,8 +205,8 @@ public class LoginActivity extends AppCompatActivity implements
                         } else {
                             Profile faceUser = Profile.getCurrentProfile();
                             user.put("name", faceUser.getName());
-                            if(user.isNew()){
-                                saveFaceImage(faceUser.getProfilePictureUri(400,400).toString());
+                            if (user.isNew()) {
+                                saveFaceImage(faceUser.getProfilePictureUri(400, 400).toString());
                             }
                             user.saveInBackground(new SaveCallback() {
                                                       @Override
@@ -207,7 +214,7 @@ public class LoginActivity extends AppCompatActivity implements
                                                           if (e == null) {
                                                               isLogged();
                                                           } else {
-                                                              Log.e("dasd",e.getMessage());
+                                                              Log.e("dasd", e.getMessage());
                                                           }
                                                       }
                                                   }

@@ -141,7 +141,7 @@ public class ActivitiesUtils {
         return name[0] + " " + name[name.length - 1];
     }
 
-    public static void newPlace(final String id, final String placeName) {
+    public static void newPlace(final String id, final String placeName, final String[] tags) {
         ParseQuery<ParseObject> query = new ParseQuery<ParseObject>("Place");
         query.whereEqualTo("ownerid", ParseUser.getCurrentUser().getUsername());
         query.whereEqualTo("placeid", id);
@@ -154,6 +154,9 @@ public class ActivitiesUtils {
                     place.put("message", "");
                     place.put("place", placeName);
                     place.put("placeid", id);
+                    for (String tag : tags) {
+                        place.add("tags", tag);
+                    }
                     place.put("ownerid", ParseUser.getCurrentUser().getUsername());
                     place.put("content", "Fez Checkin em " + placeName);
                     place.saveInBackground();

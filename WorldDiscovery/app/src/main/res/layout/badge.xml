@@ -1,0 +1,10 @@
+<ImageView android:layout_width="0dp"
+    android:layout_row="0"
+    android:layout_rowWeight="1"
+    android:layout_columnWeight="1"
+    android:layout_column="0"
+    android:padding="10dp"
+    android:alpha="0.3"
+    android:src="@drawable/badge_1_a"
+    android:layout_height="0dp"
+    xmlns:android="http://schemas.android.com/apk/res/android" />

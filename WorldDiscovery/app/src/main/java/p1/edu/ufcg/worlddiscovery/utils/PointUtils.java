@@ -73,9 +73,9 @@ public class PointUtils {
         }
 
         Log.e("ddasdas","distancia: "+ lessDistance);
-        if (lessDistance > 100) {
-            current = null;
-        }
+//        if (lessDistance > 100) {
+//            current = null;
+//        }
 
         return current;
     }
@@ -86,8 +86,8 @@ public class PointUtils {
     public static void getPoint(String pid, ValueEventListener listener) {
     }
 
-    public static void visitedPoint(String id, String name) {
-        ActivitiesUtils.newPlace(id, name);
+    public static void visitedPoint(String id, String name, String[] tags) {
+        ActivitiesUtils.newPlace(id, name, tags);
     }
 
     public static void searchPoint(String query, ChildEventListener listener) {

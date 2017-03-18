@@ -1,5 +1,7 @@
 package p1.edu.ufcg.worlddiscovery.core;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,6 +51,7 @@ public class Places {
         String id = "";
         String longitude = "";
         String reference = "";
+        JSONArray tags;
 
         try {
             if (!googlePlaceJson.isNull("name")) {
@@ -60,6 +63,13 @@ public class Places {
             latitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
             longitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
             reference = googlePlaceJson.getString("reference");
+            tags = googlePlaceJson.getJSONArray("types");
+            if (null != tags) {
+                for (int i = 0; i < tags.length(); i++) {
+                    Log.e("dasdas", tags.getString(i));
+                    googlePlaceMap.put("tags" + i, tags.getString(i));
+                }
+            }
             id = googlePlaceJson.getString("place_id");
             googlePlaceMap.put("place_name", placeName);
             googlePlaceMap.put("vicinity", vicinity);

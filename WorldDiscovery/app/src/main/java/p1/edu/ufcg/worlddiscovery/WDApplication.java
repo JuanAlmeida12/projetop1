@@ -1,18 +1,18 @@
 package p1.edu.ufcg.worlddiscovery;
 
-import android.app.Application;
 import android.support.multidex.MultiDexApplication;
 
 import com.facebook.FacebookSdk;
+import com.google.android.gms.analytics.GoogleAnalytics;
+import com.google.android.gms.analytics.Tracker;
 import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
-
-import p1.edu.ufcg.worlddiscovery.utils.FollowUtils;
 
 /**
  * Created by root on 20/09/16.
  */
 public class WDApplication extends MultiDexApplication {
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -25,4 +25,5 @@ public class WDApplication extends MultiDexApplication {
         FacebookSdk.sdkInitialize(this);
         ParseFacebookUtils.initialize(this);
     }
+
 }

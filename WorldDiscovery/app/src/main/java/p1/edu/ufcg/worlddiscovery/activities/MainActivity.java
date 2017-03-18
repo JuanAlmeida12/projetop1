@@ -57,12 +57,17 @@ import com.google.android.gms.location.places.PlaceLikelihood;
 import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.maps.android.SphericalUtil;
+import com.parse.FunctionCallback;
+import com.parse.ParseCloud;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import p1.edu.ufcg.worlddiscovery.R;
@@ -351,8 +356,17 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
     private void setUpUserInfo() {
+
+//        HashMap<String, Object> params = new HashMap<String, Object>();
+//        params.put("owner", ParseUser.getCurrentUser().getObjectId());
+//        ParseCloud.callFunctionInBackground("getWeekResume", params, new FunctionCallback<Float>() {
+//            public void done(Float ratings, ParseException e) {
+//                if (e == null) {
+//                    // ratings is 4.5
+//                }
+//            }
+//        });
 
         user = ParseUser.getCurrentUser();
 
@@ -360,10 +374,10 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
         final View header = navigationView.getHeaderView(0);
 
-        String score = user.getInt("score") != Integer.MIN_VALUE ? user.getInt("score")+"" : "0";
+        String score = user.getInt("score") != Integer.MIN_VALUE ? user.getInt("score") + "" : "0";
         String since = DateFormat.getDateFormat(this).format(user.getCreatedAt());
 
-        Log.e("dasd",user.getInt("score")+"");
+        Log.e("dasd", user.getInt("score") + "");
 
         TextView userScore = (TextView) header.findViewById(R.id.user_nav_score);
         TextView userSince = (TextView) header.findViewById(R.id.user_nav_since);
@@ -436,17 +450,23 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_checkin:
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 if (mLastLocation != null) {
-                    Log.e("ddasdas","location n é null");
+                    Log.e("ddasdas", "location n é null");
                     currentPlace = PointUtils.getCurrentLocal(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 } else {
                     currentPlace = null;
                 }
                 if (currentPlace != null) {
-                    Log.e("ddasdas","atualn é null");
+                    Log.e("ddasdas", "atualn é null");
                     builder.setMessage("Fazer Checkin em " + currentPlace.get("place_name"))
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    PointUtils.visitedPoint(currentPlace.get("id"), currentPlace.get("place_name"));
+                                    ArrayList<String> tags = new ArrayList<String>();
+                                    int i = 0;
+                                    while (currentPlace.containsKey("tags" + i)) {
+                                        tags.add(currentPlace.get("tags" + i));
+                                        i++;
+                                    }
+                                    PointUtils.visitedPoint(currentPlace.get("id"), currentPlace.get("place_name"), tags.toArray(new String[tags.size()]));
                                 }
                             });
                 } else {
@@ -611,7 +631,7 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
     }
 
-    public GoogleApiClient getmGoogleApiClient(){
+    public GoogleApiClient getmGoogleApiClient() {
         return mGoogleApiClient;
     }
 

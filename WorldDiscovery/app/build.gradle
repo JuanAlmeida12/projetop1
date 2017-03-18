@@ -5,8 +5,8 @@ android {
         javaMaxHeapSize "4g"
     }
 
-    compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.0"
 
     defaultConfig {
         applicationId "p1.edu.ufcg.worlddiscovery"
@@ -50,6 +50,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.0'
     compile 'com.android.support:cardview-v7:21.0.+'
     compile 'com.google.maps.android:android-maps-utils:0.3+'
+    compile 'com.google.android.gms:play-services-analytics:9.6.1'
 
 }
 apply plugin: 'com.google.gms.google-services'
