@@ -40,7 +40,7 @@ public class BadgesFragment extends Fragment {
 
             badgesGrid.getChildAt(type * 3 + level).setAlpha(1);
         }
-        
+
 
         return view;
     }
@@ -58,7 +58,7 @@ public class BadgesFragment extends Fragment {
                         String title = obj.getParseObject("badgeModel").fetchIfNeeded().getString("title");
                         String description = obj.getParseObject("badgeModel").fetchIfNeeded().getString("message");
                         int type = obj.getParseObject("badgeModel").fetchIfNeeded().getInt("type");
-                        int level = 1;
+                        int level = obj.getParseObject("badgeModel").fetchIfNeeded().getInt("level");
 
                         Badge badge = new Badge(title,description,type,level);
                         badges.add(badge);
