@@ -40,6 +40,7 @@ public class BadgesFragment extends Fragment {
 
             badgesGrid.getChildAt(type * 3 + level).setAlpha(1);
         }
+        
 
         return view;
     }
